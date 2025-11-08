@@ -1,21 +1,65 @@
+'use client';
+
 import { PromptTextarea } from '../molecules/prompt-textarea';
-import { ChatContainerRoot, ChatContainerContent } from '../ui/chat-container';
+import { useChat } from '@ai-sdk/react';
+import { Conversation } from './conversation';
+import { generateEmail } from '@/actions/generate';
+import { useEmailStore } from '@/stores/email.store';
 
 export const Chat = () => {
+  const { setEmail, setIsLoading } = useEmailStore();
+
+  const { messages, sendMessage, status } = useChat({
+    onToolCall: async ({ toolCall }) => {
+      console.log('toolCall', toolCall);
+      if (toolCall.toolName === 'createEmail') {
+        setIsLoading(true);
+        // generate email
+        const prompt = (toolCall.input as { prompt: string }).prompt;
+        console.log('prompt to generate email', prompt);
+
+        debugger;
+        const generatedEmail = await generateEmail(prompt, messages);
+        const email = JSON.parse(generatedEmail) as {
+          subject: string;
+          jsxBody: string;
+          htmlBody: string;
+        };
+
+        console.log('generatedEmail', email);
+        setEmail({
+          subject: email.subject,
+          jsxBody: email.jsxBody,
+          htmlBody: email.htmlBody
+        });
+        setIsLoading(false);
+      }
+    }
+  });
+
+  const isLoading = status === 'submitted' || status === 'streaming';
+
+  const handleSubmit = (message: string, files: FileList) => {
+    sendMessage({
+      text: message,
+      files: files
+    });
+  };
+
   return (
     <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full max-w-[400px] flex-col justify-between border-r p-2">
       {/* Messages list  */}
-      <ChatContainerRoot className="h-full">
-        <ChatContainerContent className="space-y-4">
-          {/* Your chat messages here */}
-          <div>Message 1</div>
-          <div>Message 2</div>
-          <div>Message 3</div>
-        </ChatContainerContent>
-      </ChatContainerRoot>
-
+      <Conversation
+        messages={messages}
+        status={status}
+        error={undefined}
+        reload={() => {}}
+        onEdit={() => {}}
+        onDelete={() => {}}
+        onShowCanvas={() => {}}
+      />
       {/* Input prompt */}
-      <PromptTextarea />
+      <PromptTextarea onSubmit={handleSubmit} isLoading={isLoading} />
     </div>
   );
 };

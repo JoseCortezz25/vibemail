@@ -10,20 +10,25 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp, Paperclip, Square, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-export function PromptTextarea() {
+interface PromptTextareaProps {
+  onSubmit: (message: string, files: FileList) => void;
+  isLoading: boolean;
+}
+
+export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     if (input.trim() || files.length > 0) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        setInput('');
-        setFiles([]);
-      }, 2000);
+      const fileList = files.reduce((dt, file) => {
+        dt.items.add(file);
+        return dt;
+      }, new DataTransfer()).files;
+      onSubmit(input, fileList);
+      setInput('');
+      setFiles([]);
     }
   };
 
