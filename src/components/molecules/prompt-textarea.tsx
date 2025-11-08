@@ -14,23 +14,24 @@ export type PromptTextareaProps = {
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
-  onSendMessage: (content: string, files?: File[]) => Promise<void>;
-  onStopGeneration: () => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onStop: () => void;
 };
 
 export function PromptTextarea({
   input,
   setInput,
   isLoading,
-  onSendMessage,
-  onStopGeneration
+  onSubmit,
+  onStop
 }: PromptTextareaProps) {
   const [files, setFiles] = useState<File[]>([]);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (input.trim() || files.length > 0) {
-      await onSendMessage(input, files);
+      onSubmit(e);
       setFiles([]);
     }
   };
@@ -104,7 +105,8 @@ export function PromptTextarea({
             variant="default"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={isLoading ? onStopGeneration : handleSubmit}
+            onClick={isLoading ? onStop : undefined}
+            type={isLoading ? 'button' : 'submit'}
           >
             {isLoading ? (
               <Square className="size-5 fill-current" />

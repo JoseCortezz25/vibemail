@@ -49,7 +49,7 @@ type PromptInputProps = {
   value?: string;
   onValueChange?: (value: string) => void;
   maxHeight?: number | string;
-  onSubmit?: () => void;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   children: React.ReactNode;
   className?: string;
 };
@@ -71,6 +71,11 @@ function PromptInput({
     onValueChange?.(newValue);
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmit?.(e);
+  };
+
   return (
     <TooltipProvider>
       <PromptInputContext.Provider
@@ -79,11 +84,17 @@ function PromptInput({
           value: value ?? internalValue,
           setValue: onValueChange ?? handleChange,
           maxHeight,
-          onSubmit,
+          onSubmit: () => {
+            const form = textareaRef.current?.closest('form');
+            if (form) {
+              form.requestSubmit();
+            }
+          },
           textareaRef
         }}
       >
-        <div
+        <form
+          onSubmit={handleSubmit}
           className={cn(
             'border-input bg-background cursor-text rounded-3xl border p-2 shadow-xs',
             className
@@ -91,7 +102,7 @@ function PromptInput({
           onClick={() => textareaRef.current?.focus()}
         >
           {children}
-        </div>
+        </form>
       </PromptInputContext.Provider>
     </TooltipProvider>
   );

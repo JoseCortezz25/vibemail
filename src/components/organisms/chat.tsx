@@ -9,15 +9,13 @@ import {
 import { useChat } from '@/domains/chat';
 
 export const Chat = () => {
-  const {
-    messages,
-    isLoading,
-    error,
-    input,
-    setInput,
-    handleSendMessage,
-    handleStopGeneration
-  } = useChat();
+  const { messages, input, setInput, handleSubmit, isLoading, error, stop } =
+    useChat({
+      api: '/api/chat',
+      onError: error => {
+        console.error('Chat error:', error);
+      }
+    });
 
   return (
     <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full max-w-[400px] flex-col justify-between border-r p-2">
@@ -44,7 +42,7 @@ export const Chat = () => {
           )}
           {error && (
             <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
-              {error}
+              {error.message}
             </div>
           )}
           <ChatContainerScrollAnchor />
@@ -56,8 +54,8 @@ export const Chat = () => {
         input={input}
         setInput={setInput}
         isLoading={isLoading}
-        onSendMessage={handleSendMessage}
-        onStopGeneration={handleStopGeneration}
+        onSubmit={handleSubmit}
+        onStop={stop}
       />
     </div>
   );
