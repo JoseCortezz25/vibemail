@@ -10,20 +10,28 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp, Paperclip, Square, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-export function PromptTextarea() {
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+export type PromptTextareaProps = {
+  input: string;
+  setInput: (value: string) => void;
+  isLoading: boolean;
+  onSendMessage: (content: string, files?: File[]) => Promise<void>;
+  onStopGeneration: () => void;
+};
+
+export function PromptTextarea({
+  input,
+  setInput,
+  isLoading,
+  onSendMessage,
+  onStopGeneration
+}: PromptTextareaProps) {
   const [files, setFiles] = useState<File[]>([]);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (input.trim() || files.length > 0) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        setInput('');
-        setFiles([]);
-      }, 2000);
+      await onSendMessage(input, files);
+      setFiles([]);
     }
   };
 
@@ -96,7 +104,7 @@ export function PromptTextarea() {
             variant="default"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={handleSubmit}
+            onClick={isLoading ? onStopGeneration : handleSubmit}
           >
             {isLoading ? (
               <Square className="size-5 fill-current" />
