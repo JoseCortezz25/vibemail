@@ -3,11 +3,10 @@
 import { PromptTextarea } from '../molecules/prompt-textarea';
 import { useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
-import { generateEmail } from '@/actions/generate';
 import { useEmailStore } from '@/stores/email.store';
 
 export const Chat = () => {
-  const { setEmail, setIsLoading } = useEmailStore();
+  const { setIsLoading } = useEmailStore();
 
   const { messages, sendMessage, status } = useChat({
     onToolCall: async ({ toolCall }) => {
@@ -15,23 +14,24 @@ export const Chat = () => {
       if (toolCall.toolName === 'createEmail') {
         setIsLoading(true);
         // generate email
-        const prompt = (toolCall.input as { prompt: string }).prompt;
-        console.log('prompt to generate email', prompt);
+        //
+        console.log('toolCall.input', toolCall);
+        //  const prompt = (toolCall.input as { prompt: string }).prompt;
+        // console.log('prompt to generate email', prompt);
 
-        debugger;
-        const generatedEmail = await generateEmail(prompt, messages);
-        const email = JSON.parse(generatedEmail) as {
-          subject: string;
-          jsxBody: string;
-          htmlBody: string;
-        };
+        // // const generatedEmail = await generateEmail(prompt, messages);
+        // // const email = JSON.parse(generatedEmail) as {
+        // //   subject: string;
+        // //   jsxBody: string;
+        // //   htmlBody: string;
+        // // };
 
-        console.log('generatedEmail', email);
-        setEmail({
-          subject: email.subject,
-          jsxBody: email.jsxBody,
-          htmlBody: email.htmlBody
-        });
+        // console.log('generatedEmail', email);
+        // setEmail({
+        //   subject: email.subject,
+        //   jsxBody: email.jsxBody,
+        //   htmlBody: email.htmlBody
+        // });
         setIsLoading(false);
       }
     }
@@ -47,7 +47,7 @@ export const Chat = () => {
   };
 
   return (
-    <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full max-w-[400px] flex-col justify-between border-r p-2">
+    <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full flex-col items-center justify-between border-r p-2">
       {/* Messages list  */}
       <Conversation
         messages={messages}

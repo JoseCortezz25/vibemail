@@ -4,7 +4,9 @@ import { TextShimmerWave } from '../ui/text-shimmer-wave';
 import { ChatContainerRoot, ChatContainerContent } from '../ui/chat-container';
 import { MessageUser } from '../molecules/message-user';
 import { MessageAssistant } from '../molecules/message-assistant';
+import { ChatEmptyState } from '../molecules/chat-empty-state';
 import { UIMessage } from 'ai';
+import { cn } from '@/lib/utils';
 
 interface ConversationProps {
   messages: UIMessage[];
@@ -26,49 +28,60 @@ export const Conversation = ({
   onShowCanvas
 }: ConversationProps) => {
   return (
-    <ChatContainerRoot className="h-full max-h-[calc(100dvh-182px)] px-3">
-      <ChatContainerContent className="space-y-4">
-        {messages.map(message => {
-          const isAssistant = message.role === 'assistant';
-
-          if (isAssistant) {
-            return (
-              <MessageAssistant
-                key={message.id}
-                message={message}
-                parts={message.parts}
-                onReload={reload}
-                onShowCanvas={onShowCanvas}
-              />
-            );
-          }
-
-          return (
-            <MessageUser
-              key={message.id}
-              message={message}
-              onEdit={onEdit}
-              onReload={reload}
-              onDelete={onDelete}
-            />
-          );
-        })}
-
-        {error && (
-          <div className="flex items-center justify-center gap-2 rounded-md bg-red-100 p-2 text-red-950">
-            <p>An error occurred. {error.message}</p>
-            <button type="button" onClick={reload} className="font-bold">
-              Retry
-            </button>
-          </div>
+    <ChatContainerRoot className="no-scrollbar h-full max-h-[calc(100dvh-182px)] w-full max-w-[768px] px-3">
+      <ChatContainerContent
+        className={cn(
+          messages.length === 0 && 'flex flex-col items-center justify-center',
+          'no-scrollbar space-y-4" h-full'
         )}
+      >
+        {messages.length === 0 ? (
+          <ChatEmptyState />
+        ) : (
+          <>
+            {messages.map(message => {
+              const isAssistant = message.role === 'assistant';
 
-        {status === 'submitted' && messages.length > 0 && (
-          <div className="group min-h-scroll-anchor mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-2 pb-2">
-            <TextShimmerWave className="font-mono text-sm" duration={1}>
-              Thinking...
-            </TextShimmerWave>
-          </div>
+              if (isAssistant) {
+                return (
+                  <MessageAssistant
+                    key={message.id}
+                    message={message}
+                    parts={message.parts}
+                    onReload={reload}
+                    onShowCanvas={onShowCanvas}
+                  />
+                );
+              }
+
+              return (
+                <MessageUser
+                  key={message.id}
+                  message={message}
+                  onEdit={onEdit}
+                  onReload={reload}
+                  onDelete={onDelete}
+                />
+              );
+            })}
+
+            {error && (
+              <div className="flex items-center justify-center gap-2 rounded-md bg-red-100 p-2 text-red-950">
+                <p>An error occurred. {error.message}</p>
+                <button type="button" onClick={reload} className="font-bold">
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {status === 'submitted' && messages.length > 0 && (
+              <div className="group min-h-scroll-anchor mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-2 pb-2">
+                <TextShimmerWave className="font-mono text-sm" duration={1}>
+                  Thinking...
+                </TextShimmerWave>
+              </div>
+            )}
+          </>
         )}
       </ChatContainerContent>
     </ChatContainerRoot>

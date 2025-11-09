@@ -52,7 +52,7 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
       onValueChange={setInput}
       isLoading={isLoading}
       onSubmit={handleSubmit}
-      className="w-full max-w-(--breakpoint-md)"
+      className="w-full max-w-(--breakpoint-md) rounded-[10px]"
     >
       {files.length > 0 && (
         <div className="flex flex-wrap gap-2 pb-2">

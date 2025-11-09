@@ -1,14 +1,30 @@
+import { generateEmail } from '@/actions/generate';
 import { tool } from 'ai';
 import { z } from 'zod';
 
 export const createEmailTool = tool({
-  description: 'Create the email template',
+  description: 'Crea el template del email',
   inputSchema: z.object({
-    prompt: z.string().describe('The prompt to create the email template')
+    prompt: z
+      .string()
+      .describe(
+        'El prompt para crear el template del email. El prompt se creo con base a la conversacion con el usuario.'
+      )
   }),
-  execute: async ({ prompt }) => {
-    console.log('prompt', prompt);
-    return `You have to create the email template based on the prompt`;
+  execute: async ({ prompt }, { messages }) => {
+    // console.log('prompt', prompt);
+    // return `You have to create the email template based on the prompt`;
+
+    const generatedEmail = await generateEmail(prompt, messages);
+    const email = JSON.parse(generatedEmail) as {
+      subject: string;
+      jsxBody: string;
+      htmlBody: string;
+    };
+
+    console.log('email', email);
+
+    return `Email generated successfully. This is the subject: ${email.subject} and this is the html body: ${email.htmlBody}`;
   }
 });
 

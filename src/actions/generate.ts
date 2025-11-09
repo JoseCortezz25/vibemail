@@ -1,7 +1,7 @@
 'use server';
 import { generatedEmailSchema } from '@/lib/schema';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { convertToModelMessages, generateObject, UIMessage } from 'ai';
+import { generateObject, ModelMessage } from 'ai';
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
@@ -9,7 +9,7 @@ const google = createGoogleGenerativeAI({
 
 export async function generateEmail(
   prompt: string,
-  messages: UIMessage[]
+  messages: ModelMessage[]
 ): Promise<string> {
   try {
     const result = await generateObject({
@@ -35,7 +35,7 @@ Based on the intent, you will respond with a single JSON object conforming to th
 
 When modifying an existing email, you MUST preserve all 'data-vibe-id' attributes on unchanged elements.`,
       messages: [
-        ...convertToModelMessages(messages),
+        ...messages,
         { role: 'user', content: 'Request from user: ' + prompt }
       ],
       schema: generatedEmailSchema
