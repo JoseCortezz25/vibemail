@@ -29,7 +29,7 @@ export const Previewer = () => {
         </h3>
 
         {/* desktop/mobile toggle - only visible in preview mode */}
-        <div className="flex w-[140px] justify-end">
+        <div className="hidden w-[140px] justify-end md:flex">
           {activePreview && (
             <DeviceToggle
               isDesktop={isDesktop}

@@ -5,30 +5,34 @@ import { ChatContainerRoot, ChatContainerContent } from '../ui/chat-container';
 import { MessageUser } from '../molecules/message-user';
 import { MessageAssistant } from '../molecules/message-assistant';
 import { ChatEmptyState } from '../molecules/chat-empty-state';
-import { UIMessage } from 'ai';
+import { ChatRequestOptions, UIMessage } from 'ai';
 import { cn } from '@/lib/utils';
 
 interface ConversationProps {
   messages: UIMessage[];
   status: 'submitted' | 'streaming' | 'ready' | 'error';
   error: Error | undefined;
-  reload: () => void;
   onEdit: (id: string, newText: string) => void;
   onDelete: (id: string) => void;
   onShowCanvas: (isShowing: boolean) => void;
+  isLoading: boolean;
+  reload: ({
+    messageId,
+    ...options
+  }: ChatRequestOptions & { messageId?: string }) => Promise<void>;
 }
 
 export const Conversation = ({
   messages,
-  status,
   error,
   reload,
   onEdit,
   onDelete,
-  onShowCanvas
+  onShowCanvas,
+  isLoading
 }: ConversationProps) => {
   return (
-    <ChatContainerRoot className="no-scrollbar h-full max-h-[calc(100dvh-182px)] w-full max-w-[768px] px-3">
+    <ChatContainerRoot className="no-scrollbar h-full max-h-[calc(100dvh-190px)] w-full max-w-[768px] px-3 lg:max-h-[calc(100dvh-182px)]">
       <ChatContainerContent
         className={cn(
           messages.length === 0 && 'flex flex-col items-center justify-center',
@@ -48,7 +52,7 @@ export const Conversation = ({
                     key={message.id}
                     message={message}
                     parts={message.parts}
-                    onReload={reload}
+                    onReload={() => reload({ messageId: message.id })}
                     onShowCanvas={onShowCanvas}
                   />
                 );
@@ -59,7 +63,7 @@ export const Conversation = ({
                   key={message.id}
                   message={message}
                   onEdit={onEdit}
-                  onReload={reload}
+                  onReload={() => reload({ messageId: message.id })}
                   onDelete={onDelete}
                 />
               );
@@ -68,13 +72,19 @@ export const Conversation = ({
             {error && (
               <div className="flex items-center justify-center gap-2 rounded-md bg-red-100 p-2 text-red-950">
                 <p>An error occurred. {error.message}</p>
-                <button type="button" onClick={reload} className="font-bold">
+                <button
+                  type="button"
+                  onClick={() =>
+                    reload({ messageId: messages[messages.length - 1].id })
+                  }
+                  className="font-bold"
+                >
                   Retry
                 </button>
               </div>
             )}
 
-            {status === 'submitted' && messages.length > 0 && (
+            {isLoading && messages.length > 0 && (
               <div className="group min-h-scroll-anchor mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-2 pb-2">
                 <TextShimmerWave className="font-mono text-sm" duration={1}>
                   Thinking...

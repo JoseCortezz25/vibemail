@@ -250,3 +250,27 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+.message-content {
+  @apply space-y-3;
+
+  ul {
+    @apply list-inside list-disc space-y-2;
+
+    li {
+      @apply pl-4;
+    }
+  }
+
+  ol {
+    @apply list-item list-inside space-y-2;
+
+    li {
+      @apply pl-4;
+    }
+  }
+
+  blockquote {
+    @apply border-l-2 border-gray-300 pl-4;
+  }
+}

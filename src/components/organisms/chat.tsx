@@ -4,35 +4,54 @@ import { PromptTextarea } from '../molecules/prompt-textarea';
 import { useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
+import { useUIStore } from '@/stores/ui.store';
+import { generateEmail } from '@/actions/generate';
+import { convertToModelMessages } from 'ai';
 
 export const Chat = () => {
-  const { setIsLoading } = useEmailStore();
+  const { setIsLoading, setEmail } = useEmailStore();
+  const { setActiveView } = useUIStore();
 
-  const { messages, sendMessage, status } = useChat({
-    onToolCall: async ({ toolCall }) => {
+  const { messages, sendMessage, status, addToolOutput, regenerate } = useChat({
+    onToolCall: async toolCall => {
       console.log('toolCall', toolCall);
-      if (toolCall.toolName === 'createEmail') {
-        setIsLoading(true);
-        // generate email
-        //
-        console.log('toolCall.input', toolCall);
-        //  const prompt = (toolCall.input as { prompt: string }).prompt;
-        // console.log('prompt to generate email', prompt);
 
-        // // const generatedEmail = await generateEmail(prompt, messages);
-        // // const email = JSON.parse(generatedEmail) as {
-        // //   subject: string;
-        // //   jsxBody: string;
-        // //   htmlBody: string;
-        // // };
+      if (toolCall.toolCall.toolName === 'createEmail') {
+        try {
+          setIsLoading(true);
+          const { prompt } = toolCall.toolCall.input as { prompt: string };
+          const modelMessages = convertToModelMessages(messages);
 
-        // console.log('generatedEmail', email);
-        // setEmail({
-        //   subject: email.subject,
-        //   jsxBody: email.jsxBody,
-        //   htmlBody: email.htmlBody
-        // });
-        setIsLoading(false);
+          const generatedEmail = await generateEmail(prompt, modelMessages);
+
+          const email = JSON.parse(generatedEmail) as {
+            subject: string;
+            jsxBody: string;
+            htmlBody: string;
+          };
+
+          setEmail({
+            subject: email.subject,
+            jsxBody: email.jsxBody,
+            htmlBody: email.htmlBody
+          });
+
+          // Auto-switch to preview on mobile/tablet when email is generated
+          if (window.innerWidth < 1024) {
+            setActiveView('preview');
+          }
+
+          addToolOutput({
+            state: 'output-available',
+            tool: 'createEmail',
+            toolCallId: toolCall.toolCall.toolCallId,
+            output: email
+          });
+        } catch (error) {
+          console.error('error', error);
+        } finally {
+          setIsLoading(false);
+        }
       }
     }
   });
@@ -47,16 +66,17 @@ export const Chat = () => {
   };
 
   return (
-    <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full flex-col items-center justify-between border-r p-2">
+    <div className="border-border relative flex h-full min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 lg:min-h-[calc(100dvh-57px)] lg:border-r">
       {/* Messages list  */}
       <Conversation
         messages={messages}
         status={status}
         error={undefined}
-        reload={() => {}}
+        reload={regenerate}
         onEdit={() => {}}
         onDelete={() => {}}
         onShowCanvas={() => {}}
+        isLoading={isLoading}
       />
       {/* Input prompt */}
       <PromptTextarea onSubmit={handleSubmit} isLoading={isLoading} />

@@ -55,7 +55,7 @@ export const PreviewerEmail = ({ isDesktop }: PreviewerEmailProps) => {
       <div
         className={cn(
           'bg-background transition-all duration-300',
-          isDesktop ? 'h-[600px] w-full max-w-4xl' : 'h-[667px] w-[375px]',
+          isDesktop ? 'h-[600px] w-full max-w-7xl' : 'h-[667px] w-[375px]',
           'border-border overflow-hidden rounded-lg border shadow-lg'
         )}
       >
