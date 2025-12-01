@@ -250,3 +250,19 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+.message-content {
+  @apply space-y-2;
+
+  ol {
+    @apply list-decimal;
+  }
+
+  ul {
+    @apply list-disc;
+  }
+
+  li {
+    @apply mb-2;
+  }
+}

@@ -86,7 +86,7 @@ export const MessageUser = ({
       >
         <div
           className={cn(
-            'grid max-w-[60%] gap-2 md:max-w-[80%]',
+            'grid max-w-[60%] gap-2 md:max-w-[40%]',
             imageAttachments && imageAttachments.length > 1
               ? 'grid-cols-2'
               : 'grid-cols-1'

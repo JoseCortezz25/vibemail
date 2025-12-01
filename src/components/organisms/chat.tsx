@@ -4,47 +4,82 @@ import { PromptTextarea } from '../molecules/prompt-textarea';
 import { useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
+import { useCallback } from 'react';
+import { createFileParts } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export const Chat = () => {
-  const { setIsLoading } = useEmailStore();
-
-  const { messages, sendMessage, status } = useChat({
+  const { setIsLoading, setEmail } = useEmailStore();
+  const { messages, sendMessage, status, setMessages, regenerate } = useChat({
     onToolCall: async ({ toolCall }) => {
-      console.log('toolCall', toolCall);
       if (toolCall.toolName === 'createEmail') {
         setIsLoading(true);
-        // generate email
-        //
-        console.log('toolCall.input', toolCall);
-        //  const prompt = (toolCall.input as { prompt: string }).prompt;
-        // console.log('prompt to generate email', prompt);
-
-        // // const generatedEmail = await generateEmail(prompt, messages);
-        // // const email = JSON.parse(generatedEmail) as {
-        // //   subject: string;
-        // //   jsxBody: string;
-        // //   htmlBody: string;
-        // // };
-
-        // console.log('generatedEmail', email);
-        // setEmail({
-        //   subject: email.subject,
-        //   jsxBody: email.jsxBody,
-        //   htmlBody: email.htmlBody
-        // });
-        setIsLoading(false);
       }
+    },
+    onFinish: async ({ message }) => {
+      const parts = message.parts;
+
+      parts.map(part => {
+        if (part.type === 'tool-createEmail') {
+          const output = part.output as {
+            subject: string;
+            jsxBody: string;
+            htmlBody: string;
+          };
+          setEmail({
+            subject: output.subject,
+            jsxBody: output.jsxBody,
+            htmlBody: output.htmlBody
+          });
+          setIsLoading(false);
+        }
+      });
+    },
+    onData: async ({ data }) => {
+      console.log('data', data);
+    },
+    onError: error => {
+      console.log('error', error);
+      toast.error('Error generating email. Try again later.');
     }
   });
 
   const isLoading = status === 'submitted' || status === 'streaming';
 
-  const handleSubmit = (message: string, files: FileList) => {
-    sendMessage({
-      text: message,
-      files: files
-    });
+  const handleSubmit = async (prompt: string, images?: FileList) => {
+    if (images) {
+      const imagePromises = createFileParts(images);
+      const imageParts = await Promise.all(imagePromises);
+
+      const messageWithImages = {
+        role: 'user' as const,
+        parts: [{ type: 'text' as const, text: prompt }, ...imageParts]
+      };
+      sendMessage(messageWithImages);
+    } else {
+      sendMessage({ text: prompt });
+    }
   };
+
+  const handleEdit = useCallback(
+    (id: string, newText: string) => {
+      setMessages(
+        messages.map(message =>
+          message.id === id
+            ? { ...message, parts: [{ type: 'text', text: newText }] }
+            : message
+        )
+      );
+    },
+    [messages, setMessages]
+  );
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      setMessages(messages.filter(message => message.id !== id));
+    },
+    [messages, setMessages]
+  );
 
   return (
     <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full flex-col items-center justify-between border-r p-2">
@@ -53,11 +88,12 @@ export const Chat = () => {
         messages={messages}
         status={status}
         error={undefined}
-        reload={() => {}}
-        onEdit={() => {}}
-        onDelete={() => {}}
+        reload={regenerate}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
         onShowCanvas={() => {}}
       />
+
       {/* Input prompt */}
       <PromptTextarea onSubmit={handleSubmit} isLoading={isLoading} />
     </div>
