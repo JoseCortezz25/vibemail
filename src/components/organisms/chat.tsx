@@ -82,7 +82,7 @@ export const Chat = () => {
   );
 
   return (
-    <div className="border-border relative flex h-full min-h-[calc(100dvh-57px)] w-full flex-col items-center justify-between border-r p-2">
+    <div className="border-border relative flex h-full min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 lg:min-h-[calc(100dvh-57px)] lg:border-r">
       {/* Messages list  */}
       <Conversation
         messages={messages}
@@ -92,6 +92,7 @@ export const Chat = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onShowCanvas={() => {}}
+        isLoading={isLoading}
       />
 
       {/* Input prompt */}

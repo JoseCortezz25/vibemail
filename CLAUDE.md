@@ -29,6 +29,7 @@ This document contains non-negotiable architectural rules. Violating these rules
 - **shadcn/ui Component Selection** → `.claude/agents/shadcn-builder.md`
 - **Code Quality Review** → `.claude/agents/code-reviewer.md`
 - **UI Architecture (legacy)** → `.claude/agents/ui-architect.md`
+- **AI Integration Planner** → `.claude/agents/ai-integration-planner.md`
 
 **How to use agents:**
 
