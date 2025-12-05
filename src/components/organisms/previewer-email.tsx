@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react';
 import { useEmailStore } from '@/stores/email.store';
 import { cn } from '@/lib/utils';
+import { DownloadEmailButton } from '../molecules/download-email-button';
+import { useElementSelection } from '@/hooks/use-element-selection';
+import { useVisualEditStore } from '@/stores/visual-edit.store';
 
 interface PreviewerEmailProps {
   isDesktop: boolean;
@@ -10,8 +13,12 @@ interface PreviewerEmailProps {
 
 export const PreviewerEmail = ({ isDesktop }: PreviewerEmailProps) => {
   const { htmlBody, isLoading } = useEmailStore();
+  const { isEditMode } = useVisualEditStore();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { attachSelectionListeners, removeSelectionListeners } =
+    useElementSelection(iframeRef);
 
+  // Load HTML into iframe
   useEffect(() => {
     if (iframeRef.current && htmlBody) {
       const iframeDoc =
@@ -21,9 +28,34 @@ export const PreviewerEmail = ({ isDesktop }: PreviewerEmailProps) => {
         iframeDoc.open();
         iframeDoc.write(htmlBody);
         iframeDoc.close();
+
+        // Attach selection listeners after content loads
+        if (isEditMode) {
+          setTimeout(() => {
+            attachSelectionListeners();
+          }, 100);
+        }
       }
     }
-  }, [htmlBody]);
+  }, [htmlBody, isEditMode, attachSelectionListeners]);
+
+  // Manage selection listeners based on edit mode
+  useEffect(() => {
+    if (isEditMode && htmlBody) {
+      attachSelectionListeners();
+    } else {
+      removeSelectionListeners();
+    }
+
+    return () => {
+      removeSelectionListeners();
+    };
+  }, [
+    isEditMode,
+    htmlBody,
+    attachSelectionListeners,
+    removeSelectionListeners
+  ]);
 
   if (isLoading) {
     return (
@@ -50,7 +82,7 @@ export const PreviewerEmail = ({ isDesktop }: PreviewerEmailProps) => {
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-auto p-6">
+    <div className="relative flex h-full w-full items-center justify-center overflow-auto p-6">
       {/* Email Preview */}
       <div
         className={cn(
@@ -66,6 +98,9 @@ export const PreviewerEmail = ({ isDesktop }: PreviewerEmailProps) => {
           sandbox="allow-same-origin"
         />
       </div>
+
+      {/* Download Button */}
+      <DownloadEmailButton />
     </div>
   );
 };

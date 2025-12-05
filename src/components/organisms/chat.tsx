@@ -4,12 +4,15 @@ import { PromptTextarea } from '../molecules/prompt-textarea';
 import { useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
+import { useVisualEditStore } from '@/stores/visual-edit.store';
 import { useCallback } from 'react';
 import { createFileParts } from '@/lib/utils';
 import { toast } from 'sonner';
+import { ElementPropertiesPanel } from './element-properties-panel';
 
 export const Chat = () => {
   const { setIsLoading, setEmail } = useEmailStore();
+  const { selectedElementId } = useVisualEditStore();
   const { messages, sendMessage, status, setMessages, regenerate } = useChat({
     onToolCall: async ({ toolCall }) => {
       if (toolCall.toolName === 'createEmail') {
@@ -83,17 +86,21 @@ export const Chat = () => {
 
   return (
     <div className="border-border relative flex h-full min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 lg:min-h-[calc(100dvh-57px)] lg:border-r">
-      {/* Messages list  */}
-      <Conversation
-        messages={messages}
-        status={status}
-        error={undefined}
-        reload={regenerate}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onShowCanvas={() => {}}
-        isLoading={isLoading}
-      />
+      {/* Conditional: Show Properties Panel or Conversation */}
+      {selectedElementId ? (
+        <ElementPropertiesPanel />
+      ) : (
+        <Conversation
+          messages={messages}
+          status={status}
+          error={undefined}
+          reload={regenerate}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onShowCanvas={() => {}}
+          isLoading={isLoading}
+        />
+      )}
 
       {/* Input prompt */}
       <PromptTextarea onSubmit={handleSubmit} isLoading={isLoading} />

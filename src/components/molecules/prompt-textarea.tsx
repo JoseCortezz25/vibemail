@@ -11,6 +11,9 @@ import { ArrowUp, Square } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Source } from '../atoms/source';
 import { InputUploadFiles } from './input-upload-file';
+import { SelectedElementIndicator } from './selected-element-indicator';
+import { useVisualEditStore } from '@/stores/visual-edit.store';
+import { MousePointer2 } from 'lucide-react';
 
 interface PromptTextareaProps {
   onSubmit: (message: string, files?: FileList) => void;
@@ -21,6 +24,7 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
   const [input, setInput] = useState('');
   const [files, setFiles] = useState<FileList | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isEditMode, setEditMode } = useVisualEditStore();
 
   const handleFileRemove = (file: File) => {
     if (!files) return;
@@ -54,6 +58,9 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
       onSubmit={handleSubmitInput}
       className="w-full max-w-(--breakpoint-md) rounded-[10px]"
     >
+      {/* Selected Element Indicator */}
+      <SelectedElementIndicator />
+
       {files && files.length > 0 && (
         <div className="flex flex-wrap gap-2 pb-2">
           {Array.from(files).map((file, index) => (
@@ -69,9 +76,26 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
       <PromptInputTextarea placeholder="Ask me anything..." />
 
       <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
-        <PromptInputAction tooltip="Attach files">
-          <InputUploadFiles setFiles={setFiles} fileInputRef={fileInputRef} />
-        </PromptInputAction>
+        <div className="flex items-center gap-2">
+          <PromptInputAction tooltip="Attach files">
+            <InputUploadFiles setFiles={setFiles} fileInputRef={fileInputRef} />
+          </PromptInputAction>
+
+          <PromptInputAction
+            tooltip={isEditMode ? 'Disable selector' : 'Enable selector'}
+          >
+            <Button
+              variant={isEditMode ? 'default' : 'ghost'}
+              size="icon"
+              className="h-8 w-8 rounded-[10px]"
+              onClick={() => setEditMode(!isEditMode)}
+            >
+              <MousePointer2
+                className={isEditMode ? 'size-4 text-white' : 'size-4'}
+              />
+            </Button>
+          </PromptInputAction>
+        </div>
 
         <PromptInputAction
           tooltip={isLoading ? 'Stop generation' : 'Send message'}

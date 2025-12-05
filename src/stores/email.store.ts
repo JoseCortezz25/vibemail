@@ -8,6 +8,7 @@ interface EmailStore {
   setEmail: (
     payload: Pick<EmailStore, 'subject' | 'jsxBody' | 'htmlBody'>
   ) => void;
+  setHtmlBody: (htmlBody: string) => void;
   resetEmail: () => void;
   setIsLoading: (isLoading: boolean) => void;
 }
@@ -19,6 +20,7 @@ export const useEmailStore = create<EmailStore>(set => ({
   isLoading: false,
   setEmail: (payload: Pick<EmailStore, 'subject' | 'jsxBody' | 'htmlBody'>) =>
     set({ ...payload }),
+  setHtmlBody: (htmlBody: string) => set({ htmlBody }),
   resetEmail: () =>
     set({ subject: '', jsxBody: '', htmlBody: '', isLoading: false }),
   setIsLoading: (isLoading: boolean) => set({ isLoading })
