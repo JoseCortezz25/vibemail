@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { modifyElementInHTML } from '@/lib/html-modifier';
 import { toast } from 'sonner';
 
-export const ElementPropertiesPanel = () => {
+export const VisualEdits = () => {
   const {
     selectedElementId,
     selectedElementType,
@@ -67,13 +67,10 @@ export const ElementPropertiesPanel = () => {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <Card className="flex h-full flex-col border-0 shadow-none">
-        <CardHeader className="border-border border-b">
-          <CardTitle className="text-lg">Edit Element</CardTitle>
-          <p className="text-muted-foreground text-sm">
-            Editing {selectedElementType} element
-          </p>
-        </CardHeader>
+      <div className="flex h-full flex-col border-0 shadow-none">
+        <div className="border-border border-b px-6 py-3.5">
+          <h2 className="text-lg font-medium">Visual Edits</h2>
+        </div>
 
         <CardContent className="flex-1 overflow-auto p-4">
           <Tabs defaultValue="content" className="w-full">
@@ -281,7 +278,7 @@ export const ElementPropertiesPanel = () => {
             Cancel
           </Button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

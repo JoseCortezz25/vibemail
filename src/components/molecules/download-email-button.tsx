@@ -8,7 +8,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip';
 import { useEmailStore } from '@/stores/email.store';
-import { DOWNLOAD_EMAIL_TEXT } from './download-email-button.text-map';
+import { DOWNLOAD_EMAIL_TEXT } from '@/constants/download-email-button.text-map';
 
 export const DownloadEmailButton = () => {
   const { htmlBody, subject } = useEmailStore();

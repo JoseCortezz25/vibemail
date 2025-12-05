@@ -8,7 +8,7 @@ import { useVisualEditStore } from '@/stores/visual-edit.store';
 import { useCallback } from 'react';
 import { createFileParts } from '@/lib/utils';
 import { toast } from 'sonner';
-import { ElementPropertiesPanel } from './element-properties-panel';
+import { VisualEdits } from './element-properties-panel';
 
 export const Chat = () => {
   const { setIsLoading, setEmail } = useEmailStore();
@@ -86,9 +86,8 @@ export const Chat = () => {
 
   return (
     <div className="border-border relative flex h-full min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 lg:min-h-[calc(100dvh-57px)] lg:border-r">
-      {/* Conditional: Show Properties Panel or Conversation */}
       {selectedElementId ? (
-        <ElementPropertiesPanel />
+        <VisualEdits />
       ) : (
         <Conversation
           messages={messages}

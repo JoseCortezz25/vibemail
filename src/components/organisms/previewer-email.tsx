@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { RefObject, useEffect, useRef } from 'react';
 import { useEmailStore } from '@/stores/email.store';
 import { cn } from '@/lib/utils';
 import { DownloadEmailButton } from '../molecules/download-email-button';
@@ -16,7 +16,7 @@ export const PreviewerEmail = ({ isDesktop }: PreviewerEmailProps) => {
   const { isEditMode } = useVisualEditStore();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { attachSelectionListeners, removeSelectionListeners } =
-    useElementSelection(iframeRef);
+    useElementSelection(iframeRef as unknown as RefObject<HTMLIFrameElement>);
 
   // Load HTML into iframe
   useEffect(() => {

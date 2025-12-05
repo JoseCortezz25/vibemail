@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, type RefObject } from 'react';
+import { useEffect, useCallback, useRef, type RefObject } from 'react';
 import {
   useVisualEditStore,
   type ElementType,
@@ -8,8 +8,8 @@ import {
 } from '@/stores/visual-edit.store';
 
 const HIGHLIGHT_CLASS = 'vibe-selected-element';
+const HOVER_CLASS = 'vibe-hovered-element';
 const HIGHLIGHT_STYLES = `
-  /* Selected element styles */
   .${HIGHLIGHT_CLASS} {
     outline: 2px solid #3b82f6 !important;
     outline-offset: 2px !important;
@@ -32,28 +32,14 @@ const HIGHLIGHT_STYLES = `
   }
 
   /* Hoverable element styles - when selector is active */
-  body.vibe-selector-active * {
+  body.vibe-selector-active {
     cursor: pointer !important;
   }
 
-  body.vibe-selector-active *:hover {
+  body.vibe-selector-active .${HOVER_CLASS} {
     outline: 1px dashed #60a5fa !important;
     outline-offset: 2px !important;
     background-color: rgba(59, 130, 246, 0.05) !important;
-  }
-
-
-  /* Don't apply hover to already selected element */
-  body.vibe-selector-active .${HIGHLIGHT_CLASS}:hover {
-    outline: 2px solid #3b82f6 !important;
-    background-color: transparent !important;
-  }
-
-  /* Don't apply hover to body and html */
-  body.vibe-selector-active body:hover,
-  body.vibe-selector-active html:hover {
-    outline: none !important;
-    background-color: transparent !important;
   }
 `;
 
@@ -61,6 +47,7 @@ export const useElementSelection = (
   iframeRef: RefObject<HTMLIFrameElement>
 ) => {
   const { selectElement, selectedElementId, isEditMode } = useVisualEditStore();
+  const hoveredElementRef = useRef<HTMLElement | null>(null);
 
   // Inject highlight styles into iframe
   const injectHighlightStyles = useCallback(() => {
@@ -146,6 +133,8 @@ export const useElementSelection = (
   // Handle element click
   const handleElementClick = useCallback(
     (event: MouseEvent) => {
+      debugger;
+
       console.log('🖱️ Click detected in iframe', { isEditMode });
 
       if (!isEditMode) {
@@ -227,6 +216,39 @@ export const useElementSelection = (
     });
   }, [iframeRef]);
 
+  const clearHoveredElement = useCallback(() => {
+    if (hoveredElementRef.current) {
+      hoveredElementRef.current.classList.remove(HOVER_CLASS);
+      hoveredElementRef.current = null;
+    }
+  }, []);
+
+  const handleElementHover = useCallback(
+    (event: MouseEvent) => {
+      if (!isEditMode) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (!target) {
+        clearHoveredElement();
+        return;
+      }
+
+      if (target.tagName === 'BODY' || target.tagName === 'HTML') {
+        clearHoveredElement();
+        return;
+      }
+
+      if (hoveredElementRef.current === target) return;
+
+      clearHoveredElement();
+      target.classList.add(HOVER_CLASS);
+      hoveredElementRef.current = target;
+    },
+    [clearHoveredElement, isEditMode]
+  );
+
   // Attach click listeners to iframe elements
   const attachSelectionListeners = useCallback(() => {
     if (!iframeRef.current) {
@@ -246,11 +268,20 @@ export const useElementSelection = (
     // Add selector active class to body for hover styles
     iframeDoc.body.classList.add('vibe-selector-active');
 
+    // Track hover to only outline the real target
+    iframeDoc.addEventListener('mousemove', handleElementHover, true);
+    iframeDoc.addEventListener('mouseleave', clearHoveredElement, true);
+
     // Add click listener to iframe body
     iframeDoc.body.addEventListener('click', handleElementClick, true);
 
     console.log('✅ Click listeners attached to iframe');
-  }, [iframeRef, handleElementClick, injectHighlightStyles]);
+  }, [
+    iframeRef,
+    handleElementClick,
+    handleElementHover,
+    injectHighlightStyles
+  ]);
 
   // Remove click listeners
   const removeSelectionListeners = useCallback(() => {
@@ -262,10 +293,14 @@ export const useElementSelection = (
     // Remove selector active class from body
     iframeDoc.body.classList.remove('vibe-selector-active');
 
+    clearHoveredElement();
+
+    iframeDoc.removeEventListener('mousemove', handleElementHover, true);
+    iframeDoc.removeEventListener('mouseleave', clearHoveredElement, true);
     iframeDoc.body.removeEventListener('click', handleElementClick, true);
 
     console.log('🔴 Click listeners removed from iframe');
-  }, [iframeRef, handleElementClick]);
+  }, [clearHoveredElement, handleElementClick, handleElementHover, iframeRef]);
 
   // Update highlight when selected element changes
   useEffect(() => {

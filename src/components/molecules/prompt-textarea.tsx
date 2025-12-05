@@ -14,6 +14,8 @@ import { InputUploadFiles } from './input-upload-file';
 import { SelectedElementIndicator } from './selected-element-indicator';
 import { useVisualEditStore } from '@/stores/visual-edit.store';
 import { MousePointer2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useEmailStore } from '@/stores/email.store';
 
 interface PromptTextareaProps {
   onSubmit: (message: string, files?: FileList) => void;
@@ -25,6 +27,7 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
   const [files, setFiles] = useState<FileList | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isEditMode, setEditMode } = useVisualEditStore();
+  const { htmlBody } = useEmailStore();
 
   const handleFileRemove = (file: File) => {
     if (!files) return;
@@ -81,20 +84,23 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
             <InputUploadFiles setFiles={setFiles} fileInputRef={fileInputRef} />
           </PromptInputAction>
 
-          <PromptInputAction
-            tooltip={isEditMode ? 'Disable selector' : 'Enable selector'}
-          >
-            <Button
-              variant={isEditMode ? 'default' : 'ghost'}
-              size="icon"
-              className="h-8 w-8 rounded-[10px]"
-              onClick={() => setEditMode(!isEditMode)}
-            >
-              <MousePointer2
-                className={isEditMode ? 'size-4 text-white' : 'size-4'}
-              />
-            </Button>
-          </PromptInputAction>
+          {!!htmlBody && (
+            <PromptInputAction tooltip="Select elements">
+              <Button
+                variant="ghost"
+                className={cn(
+                  'h-8 cursor-pointer rounded-[10px] p-2 text-sm transition-all',
+                  !isEditMode
+                    ? 'bg-gray-100'
+                    : 'bg-black-700 hover:bg-black-700/80 text-white hover:text-white'
+                )}
+                onClick={() => setEditMode(!isEditMode)}
+              >
+                <MousePointer2 className="size-4" />
+                Cursor
+              </Button>
+            </PromptInputAction>
+          )}
         </div>
 
         <PromptInputAction

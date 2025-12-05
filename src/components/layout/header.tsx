@@ -10,7 +10,7 @@ export const Header = () => {
   return (
     <header className="border-border flex w-full items-center justify-between border-b p-4">
       <nav>
-        <h3>Vibe Emailing</h3>
+        <h3 className="text-lg font-medium">Vibe Emailing</h3>
       </nav>
 
       {/* View toggle - only visible on mobile/tablet when preview is available */}

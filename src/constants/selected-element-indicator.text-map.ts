@@ -8,7 +8,8 @@ export const SELECTED_ELEMENT_TEXT = {
     image: 'Image',
     button: 'Button',
     link: 'Link',
-    container: 'Container'
+    container: 'Container',
+    strong: 'Text'
   },
   actions: {
     deselect: 'Deselect',
