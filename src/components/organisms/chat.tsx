@@ -1,7 +1,7 @@
 'use client';
 
 import { PromptTextarea } from '../molecules/prompt-textarea';
-import { useChat } from '@ai-sdk/react';
+import { UIMessage, useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
 import { useVisualEditStore } from '@/stores/visual-edit.store';
@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 import { createFileParts } from '@/lib/utils';
 import { toast } from 'sonner';
 import { VisualEdits } from './element-properties-panel';
+import { FileUIPart } from 'ai';
 
 export const Chat = () => {
   const { setIsLoading, setEmail } = useEmailStore();
@@ -65,14 +66,17 @@ export const Chat = () => {
   };
 
   const handleEdit = useCallback(
-    (id: string, newText: string) => {
-      setMessages(
-        messages.map(message =>
-          message.id === id
-            ? { ...message, parts: [{ type: 'text', text: newText }] }
-            : message
-        )
+    (id: string, newText: string, newImages?: FileUIPart[]) => {
+      const findMessages: UIMessage[] = messages.map((message: UIMessage) =>
+        message.id === id
+          ? {
+              ...message,
+              parts: [{ type: 'text', text: newText }, ...(newImages || [])]
+            }
+          : message
       );
+
+      setMessages(findMessages);
     },
     [messages, setMessages]
   );

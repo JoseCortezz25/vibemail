@@ -5,14 +5,14 @@ import { ChatContainerRoot, ChatContainerContent } from '../ui/chat-container';
 import { MessageUser } from '../molecules/message-user';
 import { MessageAssistant } from '../molecules/message-assistant';
 import { ChatEmptyState } from '../molecules/chat-empty-state';
-import { ChatRequestOptions, UIMessage } from 'ai';
+import { ChatRequestOptions, FileUIPart, UIMessage } from 'ai';
 import { cn } from '@/lib/utils';
 
 interface ConversationProps {
   messages: UIMessage[];
   status: 'submitted' | 'streaming' | 'ready' | 'error';
   error: Error | undefined;
-  onEdit: (id: string, newText: string) => void;
+  onEdit: (id: string, newText: string, newImages?: FileUIPart[]) => void;
   onDelete: (id: string) => void;
   onShowCanvas: (isShowing: boolean) => void;
   isLoading: boolean;

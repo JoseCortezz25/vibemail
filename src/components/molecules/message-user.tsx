@@ -11,10 +11,11 @@ import { Button } from '@/components/ui/button';
 import type { FileUIPart, UIMessage } from 'ai';
 import { useRef, useState } from 'react';
 import { getMessageText } from '@/lib/message-utils';
+import { DialogModal } from '../organisms/dialog';
 
 interface MessageUserProps {
   message: UIMessage;
-  onEdit: (id: string, newText: string) => void;
+  onEdit: (id: string, newText: string, newImages?: FileUIPart[]) => void;
   onReload: () => void;
   onDelete: (id: string) => void;
 }
@@ -60,8 +61,14 @@ export const MessageUser = ({
   };
 
   const handleSave = () => {
+    const currentImages = message.parts?.filter(
+      part =>
+        part.type === 'file' &&
+        (part as FileUIPart).mediaType?.startsWith('image/')
+    ) as FileUIPart[];
+
     if (onEdit) {
-      onEdit(message.id, editInput);
+      onEdit(message.id, editInput, currentImages);
     }
     onReload();
     setIsEditing(false);
@@ -74,6 +81,7 @@ export const MessageUser = ({
   return (
     <Message
       key={message.id}
+      data-message-id={message.id}
       className={cn(
         'group',
         message.role === 'user' ? 'justify-end' : 'justify-start'
@@ -94,12 +102,17 @@ export const MessageUser = ({
         >
           {imageAttachments &&
             imageAttachments.map((attachment, index) => (
-              <img
+              <DialogModal
+                image={(attachment as FileUIPart).url}
                 key={`${message.id}-${index}`}
-                src={(attachment as FileUIPart).url}
-                alt={(attachment as FileUIPart).filename || 'image'}
-                className="h-full w-full cursor-pointer object-cover"
-              />
+              >
+                <img
+                  key={`${message.id}-${index}`}
+                  src={(attachment as FileUIPart).url}
+                  alt={(attachment as FileUIPart).filename || 'image'}
+                  className="h-full w-full cursor-pointer object-cover"
+                />
+              </DialogModal>
             ))}
         </div>
 

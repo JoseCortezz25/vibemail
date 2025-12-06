@@ -1,6 +1,6 @@
 'use client';
 
-import { Image, Plus } from 'lucide-react';
+import { Image, Paperclip } from 'lucide-react';
 import { RefObject, SetStateAction, useState } from 'react';
 import { Dispatch } from 'react';
 import {
@@ -51,7 +51,7 @@ export const InputUploadFiles = ({
       />
       <DropdownMenu>
         <DropdownMenuTrigger className="cursor-pointer rounded-[10px] bg-gray-100 p-2">
-          <Plus className="size-4" />
+          <Paperclip className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="max-w-[300px] rounded-xl">
           <DropdownMenuItem

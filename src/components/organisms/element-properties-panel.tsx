@@ -1,7 +1,12 @@
 'use client';
 
 import { CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,202 +77,209 @@ export const VisualEdits = () => {
           <h2 className="text-lg font-medium">Visual Edits</h2>
         </div>
 
-        <CardContent className="flex-1 overflow-auto p-4">
-          <Tabs defaultValue="content" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="content">Content</TabsTrigger>
-              <TabsTrigger value="style">Style</TabsTrigger>
-              <TabsTrigger value="layout">Layout</TabsTrigger>
-            </TabsList>
-
-            {/* Content Tab */}
-            <TabsContent value="content" className="space-y-4">
-              {isTextElement && (
-                <div className="space-y-2">
-                  <Label htmlFor="content">Text Content</Label>
-                  <Textarea
-                    id="content"
-                    value={selectedElementProperties.content || ''}
-                    onChange={e =>
-                      updateElementProperty('content', e.target.value)
-                    }
-                    rows={4}
-                    placeholder="Enter text content..."
-                  />
-                </div>
-              )}
-
-              {isImageElement && (
-                <>
+        <CardContent className="max-h-[calc(100dvh-190px)] flex-1 overflow-auto p-4">
+          <Accordion
+            type="multiple"
+            defaultValue={['content', 'style', 'layout']}
+            className="w-full"
+          >
+            {/* Content Accordion */}
+            <AccordionItem value="content">
+              <AccordionTrigger>Content</AccordionTrigger>
+              <AccordionContent className="space-y-4">
+                {isTextElement && (
                   <div className="space-y-2">
-                    <Label htmlFor="src">Image URL</Label>
-                    <Input
-                      id="src"
-                      type="url"
-                      value={selectedElementProperties.src || ''}
+                    <Label htmlFor="content">Text Content</Label>
+                    <Textarea
+                      id="content"
+                      value={selectedElementProperties.content || ''}
                       onChange={e =>
-                        updateElementProperty('src', e.target.value)
+                        updateElementProperty('content', e.target.value)
+                      }
+                      rows={4}
+                      placeholder="Enter text content..."
+                    />
+                  </div>
+                )}
+
+                {isImageElement && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="src">Image URL</Label>
+                      <Input
+                        id="src"
+                        type="url"
+                        value={selectedElementProperties.src || ''}
+                        onChange={e =>
+                          updateElementProperty('src', e.target.value)
+                        }
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="alt">Alt Text</Label>
+                      <Input
+                        id="alt"
+                        value={selectedElementProperties.alt || ''}
+                        onChange={e =>
+                          updateElementProperty('alt', e.target.value)
+                        }
+                        placeholder="Describe the image..."
+                      />
+                    </div>
+                  </>
+                )}
+
+                {selectedElementType === 'link' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="href">Link URL</Label>
+                    <Input
+                      id="href"
+                      type="url"
+                      value={selectedElementProperties.href || ''}
+                      onChange={e =>
+                        updateElementProperty('href', e.target.value)
                       }
                       placeholder="https://..."
                     />
                   </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
 
+            {/* Style Accordion */}
+            <AccordionItem value="style">
+              <AccordionTrigger>Style</AccordionTrigger>
+              <AccordionContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="alt">Alt Text</Label>
+                    <Label htmlFor="color">Text Color</Label>
                     <Input
-                      id="alt"
-                      value={selectedElementProperties.alt || ''}
+                      id="color"
+                      type="color"
+                      value={selectedElementProperties.color || '#000000'}
                       onChange={e =>
-                        updateElementProperty('alt', e.target.value)
+                        updateElementProperty('color', e.target.value)
                       }
-                      placeholder="Describe the image..."
+                      className="h-10"
                     />
                   </div>
-                </>
-              )}
 
-              {selectedElementType === 'link' && (
-                <div className="space-y-2">
-                  <Label htmlFor="href">Link URL</Label>
-                  <Input
-                    id="href"
-                    type="url"
-                    value={selectedElementProperties.href || ''}
-                    onChange={e =>
-                      updateElementProperty('href', e.target.value)
-                    }
-                    placeholder="https://..."
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="backgroundColor">Background</Label>
+                    <Input
+                      id="backgroundColor"
+                      type="color"
+                      value={
+                        selectedElementProperties.backgroundColor || '#ffffff'
+                      }
+                      onChange={e =>
+                        updateElementProperty('backgroundColor', e.target.value)
+                      }
+                      className="h-10"
+                    />
+                  </div>
                 </div>
-              )}
-            </TabsContent>
 
-            {/* Style Tab */}
-            <TabsContent value="style" className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+                <Separator />
+
                 <div className="space-y-2">
-                  <Label htmlFor="color">Text Color</Label>
+                  <Label htmlFor="fontSize">Font Size</Label>
                   <Input
-                    id="color"
-                    type="color"
-                    value={selectedElementProperties.color || '#000000'}
+                    id="fontSize"
+                    value={selectedElementProperties.fontSize || ''}
                     onChange={e =>
-                      updateElementProperty('color', e.target.value)
+                      updateElementProperty('fontSize', e.target.value)
                     }
-                    className="h-10"
+                    placeholder="16px"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor">Background</Label>
+                  <Label htmlFor="fontWeight">Font Weight</Label>
                   <Input
-                    id="backgroundColor"
-                    type="color"
-                    value={
-                      selectedElementProperties.backgroundColor || '#ffffff'
-                    }
+                    id="fontWeight"
+                    value={selectedElementProperties.fontWeight || ''}
                     onChange={e =>
-                      updateElementProperty('backgroundColor', e.target.value)
+                      updateElementProperty('fontWeight', e.target.value)
                     }
-                    className="h-10"
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label htmlFor="fontSize">Font Size</Label>
-                <Input
-                  id="fontSize"
-                  value={selectedElementProperties.fontSize || ''}
-                  onChange={e =>
-                    updateElementProperty('fontSize', e.target.value)
-                  }
-                  placeholder="16px"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="fontWeight">Font Weight</Label>
-                <Input
-                  id="fontWeight"
-                  value={selectedElementProperties.fontWeight || ''}
-                  onChange={e =>
-                    updateElementProperty('fontWeight', e.target.value)
-                  }
-                  placeholder="400"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="textAlign">Text Align</Label>
-                <Input
-                  id="textAlign"
-                  value={selectedElementProperties.textAlign || ''}
-                  onChange={e =>
-                    updateElementProperty('textAlign', e.target.value)
-                  }
-                  placeholder="left"
-                />
-              </div>
-            </TabsContent>
-
-            {/* Layout Tab */}
-            <TabsContent value="layout" className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="width">Width</Label>
-                  <Input
-                    id="width"
-                    value={selectedElementProperties.width || ''}
-                    onChange={e =>
-                      updateElementProperty('width', e.target.value)
-                    }
-                    placeholder="auto"
+                    placeholder="400"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="height">Height</Label>
+                  <Label htmlFor="textAlign">Text Align</Label>
                   <Input
-                    id="height"
-                    value={selectedElementProperties.height || ''}
+                    id="textAlign"
+                    value={selectedElementProperties.textAlign || ''}
                     onChange={e =>
-                      updateElementProperty('height', e.target.value)
+                      updateElementProperty('textAlign', e.target.value)
                     }
-                    placeholder="auto"
+                    placeholder="left"
                   />
                 </div>
-              </div>
+              </AccordionContent>
+            </AccordionItem>
 
-              <Separator />
+            {/* Layout Accordion */}
+            <AccordionItem value="layout">
+              <AccordionTrigger>Layout</AccordionTrigger>
+              <AccordionContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="width">Width</Label>
+                    <Input
+                      id="width"
+                      value={selectedElementProperties.width || ''}
+                      onChange={e =>
+                        updateElementProperty('width', e.target.value)
+                      }
+                      placeholder="auto"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="padding">Padding</Label>
-                <Input
-                  id="padding"
-                  value={selectedElementProperties.padding || ''}
-                  onChange={e =>
-                    updateElementProperty('padding', e.target.value)
-                  }
-                  placeholder="0px"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="height">Height</Label>
+                    <Input
+                      id="height"
+                      value={selectedElementProperties.height || ''}
+                      onChange={e =>
+                        updateElementProperty('height', e.target.value)
+                      }
+                      placeholder="auto"
+                    />
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="margin">Margin</Label>
-                <Input
-                  id="margin"
-                  value={selectedElementProperties.margin || ''}
-                  onChange={e =>
-                    updateElementProperty('margin', e.target.value)
-                  }
-                  placeholder="0px"
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="padding">Padding</Label>
+                  <Input
+                    id="padding"
+                    value={selectedElementProperties.padding || ''}
+                    onChange={e =>
+                      updateElementProperty('padding', e.target.value)
+                    }
+                    placeholder="0px"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="margin">Margin</Label>
+                  <Input
+                    id="margin"
+                    value={selectedElementProperties.margin || ''}
+                    onChange={e =>
+                      updateElementProperty('margin', e.target.value)
+                    }
+                    placeholder="0px"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </CardContent>
 
         <div className="border-border flex gap-2 border-t p-4">

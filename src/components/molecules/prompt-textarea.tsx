@@ -76,7 +76,10 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
         </div>
       )}
 
-      <PromptInputTextarea placeholder="Ask me anything..." />
+      <PromptInputTextarea
+        placeholder="Ask me anything..."
+        className="max-h-[100px] px-1"
+      />
 
       <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
         <div className="flex items-center gap-2">
@@ -88,8 +91,9 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
             <PromptInputAction tooltip="Select elements">
               <Button
                 variant="ghost"
+                disabled={isLoading}
                 className={cn(
-                  'h-8 cursor-pointer rounded-[10px] p-2 text-sm transition-all',
+                  'h-8 cursor-pointer rounded-[10px] p-2 text-sm transition-all disabled:cursor-not-allowed',
                   !isEditMode
                     ? 'bg-gray-100'
                     : 'bg-black-700 hover:bg-black-700/80 text-white hover:text-white'
@@ -97,7 +101,7 @@ export function PromptTextarea({ onSubmit, isLoading }: PromptTextareaProps) {
                 onClick={() => setEditMode(!isEditMode)}
               >
                 <MousePointer2 className="size-4" />
-                Cursor
+                Design
               </Button>
             </PromptInputAction>
           )}
