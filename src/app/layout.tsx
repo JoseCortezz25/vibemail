@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Maily',
-  description: 'Maily is a tool that helps you create emails using AI'
+  description: 'Maily is a tool that helps you create emails using AI',
+  metadataBase: new URL('https://maily-app.vercel.app')
 };
 
 export default function RootLayout({

@@ -2,8 +2,8 @@
 
 import { TextShimmerWave } from '../ui/text-shimmer-wave';
 import { ChatContainerRoot, ChatContainerContent } from '../ui/chat-container';
-import { MessageUser } from '../molecules/message-user';
-import { MessageAssistant } from '../molecules/message-assistant';
+import { MessageUser } from './message-user';
+import { MessageAssistant } from './message-assistant';
 import { ChatEmptyState } from '../molecules/chat-empty-state';
 import { ChatRequestOptions, FileUIPart, UIMessage } from 'ai';
 import { cn } from '@/lib/utils';

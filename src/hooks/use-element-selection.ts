@@ -46,7 +46,7 @@ const HIGHLIGHT_STYLES = `
 export const useElementSelection = (
   iframeRef: RefObject<HTMLIFrameElement>
 ) => {
-  const { selectElement, selectedElementId, isEditMode } = useVisualEditStore();
+  const { selectElement, selectedElement, isEditMode } = useVisualEditStore();
   const hoveredElementRef = useRef<HTMLElement | null>(null);
 
   // Inject highlight styles into iframe
@@ -130,6 +130,11 @@ export const useElementSelection = (
     return vibeId;
   };
 
+  // Extract the outer HTML (code) of the element
+  const extractElementCode = (element: HTMLElement): string => {
+    return element.outerHTML;
+  };
+
   // Handle element click
   const handleElementClick = useCallback(
     (event: MouseEvent) => {
@@ -167,13 +172,24 @@ export const useElementSelection = (
 
       const elementType = getElementType(element.tagName);
       const properties = extractElementProperties(element);
+      const code = extractElementCode(element);
 
       // Add element type attribute for CSS label
       element.setAttribute('data-vibe-element-type', elementType);
 
-      console.log('✅ Selecting element:', { vibeId, elementType, properties });
+      console.log('✅ Selecting element:', {
+        vibeId,
+        elementType,
+        properties,
+        code
+      });
 
-      selectElement(vibeId, elementType, properties);
+      selectElement({
+        id: vibeId,
+        type: elementType,
+        properties,
+        code
+      });
     },
     [isEditMode, selectElement]
   );
@@ -304,12 +320,12 @@ export const useElementSelection = (
 
   // Update highlight when selected element changes
   useEffect(() => {
-    if (selectedElementId) {
-      highlightElement(selectedElementId);
+    if (selectedElement?.id) {
+      highlightElement(selectedElement.id);
     } else {
       removeHighlight();
     }
-  }, [selectedElementId, highlightElement, removeHighlight]);
+  }, [selectedElement?.id, highlightElement, removeHighlight]);
 
   return {
     attachSelectionListeners,

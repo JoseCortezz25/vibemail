@@ -31,22 +31,23 @@ export interface ElementProperties {
   [key: string]: unknown;
 }
 
+export interface SelectedElement {
+  id: string;
+  type: ElementType;
+  properties: ElementProperties;
+  code: string;
+}
+
 export interface VisualEditState {
-  // Selected element state
-  selectedElementId: string | null;
-  selectedElementType: ElementType | null;
-  selectedElementProperties: ElementProperties | null;
+  // Selected element state (grouped)
+  selectedElement: SelectedElement | null;
 
   // Edit mode
   isEditMode: boolean;
   editSource: 'visual' | 'ai' | null;
 
   // Actions
-  selectElement: (
-    id: string,
-    type: ElementType,
-    properties: ElementProperties
-  ) => void;
+  selectElement: (element: SelectedElement) => void;
   deselectElement: () => void;
   updateElementProperty: (key: string, value: unknown) => void;
   setEditMode: (enabled: boolean) => void;
@@ -55,9 +56,7 @@ export interface VisualEditState {
 }
 
 const initialState = {
-  selectedElementId: null,
-  selectedElementType: null,
-  selectedElementProperties: null,
+  selectedElement: null,
   isEditMode: false,
   editSource: null
 };
@@ -65,20 +64,16 @@ const initialState = {
 export const useVisualEditStore = create<VisualEditState>(set => ({
   ...initialState,
 
-  selectElement: (id, type, properties) => {
+  selectElement: element => {
     set({
-      selectedElementId: id,
-      selectedElementType: type,
-      selectedElementProperties: properties,
+      selectedElement: element,
       isEditMode: true
     });
   },
 
   deselectElement: () => {
     set({
-      selectedElementId: null,
-      selectedElementType: null,
-      selectedElementProperties: null,
+      selectedElement: null,
       isEditMode: false,
       editSource: null
     });
@@ -86,10 +81,13 @@ export const useVisualEditStore = create<VisualEditState>(set => ({
 
   updateElementProperty: (key, value) => {
     set(state => ({
-      selectedElementProperties: state.selectedElementProperties
+      selectedElement: state.selectedElement
         ? {
-            ...state.selectedElementProperties,
-            [key]: value
+            ...state.selectedElement,
+            properties: {
+              ...state.selectedElement.properties,
+              [key]: value
+            }
           }
         : null
     }));
@@ -99,9 +97,7 @@ export const useVisualEditStore = create<VisualEditState>(set => ({
     set({ isEditMode: enabled });
     if (!enabled) {
       set({
-        selectedElementId: null,
-        selectedElementType: null,
-        selectedElementProperties: null,
+        selectedElement: null,
         editSource: null
       });
     }

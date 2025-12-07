@@ -5,14 +5,14 @@ import { useVisualEditStore } from '@/stores/visual-edit.store';
 import { SELECTED_ELEMENT_TEXT } from '@/constants/selected-element-indicator.text-map';
 
 export const SelectedElementIndicator = () => {
-  const { selectedElementType, selectedElementId } = useVisualEditStore();
+  const { selectedElement } = useVisualEditStore();
 
-  if (!selectedElementType || !selectedElementId) {
+  if (!selectedElement) {
     return null;
   }
 
   const elementTypeLabel =
-    SELECTED_ELEMENT_TEXT.elementTypes[selectedElementType];
+    SELECTED_ELEMENT_TEXT.elementTypes[selectedElement.type];
 
   return (
     <Badge variant="selected" className="gap-1">

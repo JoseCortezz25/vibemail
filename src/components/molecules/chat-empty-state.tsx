@@ -10,7 +10,7 @@ export const ChatEmptyState = () => {
       </div>
       <div className="flex flex-col items-center gap-2 text-center">
         <h3 className="text-foreground text-lg font-semibold">
-          Welcome to Emaily Agent
+          Welcome to Maily Agent
         </h3>
         <p className="text-muted-foreground max-w-[280px] text-sm">
           Send a message to begin creating your email with AI assistance.

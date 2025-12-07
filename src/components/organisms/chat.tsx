@@ -1,6 +1,6 @@
 'use client';
 
-import { PromptTextarea } from '../molecules/prompt-textarea';
+import { PromptTextarea } from '@/domains/chat/components/organisms/prompt-textarea';
 import { UIMessage, useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
@@ -8,12 +8,12 @@ import { useVisualEditStore } from '@/stores/visual-edit.store';
 import { useCallback } from 'react';
 import { createFileParts } from '@/lib/utils';
 import { toast } from 'sonner';
-import { VisualEdits } from './element-properties-panel';
+import { VisualEdits } from '@/domains/visual-editing/components/organisms/element-properties-panel';
 import { FileUIPart } from 'ai';
 
 export const Chat = () => {
-  const { setIsLoading, setEmail } = useEmailStore();
-  const { selectedElementId } = useVisualEditStore();
+  const { setIsLoading, setEmail, htmlBody } = useEmailStore();
+  const { selectedElement, isEditMode, setEditMode } = useVisualEditStore();
   const { messages, sendMessage, status, setMessages, regenerate } = useChat({
     onToolCall: async ({ toolCall }) => {
       if (toolCall.toolName === 'createEmail') {
@@ -51,17 +51,30 @@ export const Chat = () => {
   const isLoading = status === 'submitted' || status === 'streaming';
 
   const handleSubmit = async (prompt: string, images?: FileList) => {
+    // Build the prompt with element context if selected
+    let finalPrompt = prompt;
+
+    if (selectedElement) {
+      const elementContext = `[Selected Element Context]
+      Type: ${selectedElement.type}
+      Code: ${selectedElement.code}
+
+      [User Request]
+      ${prompt}`;
+      finalPrompt = elementContext;
+    }
+
     if (images) {
       const imagePromises = createFileParts(images);
       const imageParts = await Promise.all(imagePromises);
 
       const messageWithImages = {
         role: 'user' as const,
-        parts: [{ type: 'text' as const, text: prompt }, ...imageParts]
+        parts: [{ type: 'text' as const, text: finalPrompt }, ...imageParts]
       };
       sendMessage(messageWithImages);
     } else {
-      sendMessage({ text: prompt });
+      sendMessage({ text: finalPrompt });
     }
   };
 
@@ -90,7 +103,7 @@ export const Chat = () => {
 
   return (
     <div className="border-border relative flex h-full min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 lg:min-h-[calc(100dvh-57px)] lg:border-r">
-      {selectedElementId ? (
+      {selectedElement ? (
         <VisualEdits />
       ) : (
         <Conversation
@@ -106,7 +119,13 @@ export const Chat = () => {
       )}
 
       {/* Input prompt */}
-      <PromptTextarea onSubmit={handleSubmit} isLoading={isLoading} />
+      <PromptTextarea
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        isEditMode={isEditMode}
+        hasHtmlBody={!!htmlBody}
+        onToggleEditMode={() => setEditMode(!isEditMode)}
+      />
     </div>
   );
 };
