@@ -1,7 +1,3 @@
-// 'use client' required for:
-// - Form input state management
-// - File upload interactions
-// - Button click handlers
 'use client';
 
 import {

@@ -1,7 +1,3 @@
-// 'use client' required for:
-// - Form interactions and edit state
-// - Copy to clipboard functionality
-// - Button click handlers
 'use client';
 
 import {

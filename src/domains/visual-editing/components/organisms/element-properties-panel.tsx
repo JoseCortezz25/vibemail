@@ -1,7 +1,3 @@
-// 'use client' required for:
-// - Form interactions and state updates
-// - Zustand store consumption (useVisualEditStore, useEmailStore)
-// - Toast notifications (sonner)
 'use client';
 
 import { CardContent } from '@/components/ui/card';
@@ -9,7 +5,6 @@ import { Accordion } from '@/components/ui/accordion';
 import { useVisualEditStore } from '@/stores/visual-edit.store';
 import { useEmailStore } from '@/stores/email.store';
 import { EmptyStateMessage } from '@/components/atoms/empty-state-message';
-import { PropertyPanelHeader } from '@/components/molecules/property-panel-header';
 import { ContentPropertiesSection } from '@/components/molecules/content-properties-section';
 import { StylePropertiesSection } from '@/components/molecules/style-properties-section';
 import { LayoutPropertiesSection } from '@/components/molecules/layout-properties-section';
@@ -47,8 +42,6 @@ export function VisualEdits() {
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex h-full flex-col border-0 shadow-none">
-        <PropertyPanelHeader title="Visual Edits" />
-
         <CardContent className="max-h-[calc(100dvh-190px)] flex-1 overflow-auto p-4">
           <Accordion
             type="multiple"

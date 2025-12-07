@@ -1,6 +1,3 @@
-// 'use client' required for:
-// - Copy to clipboard functionality
-// - Button click handlers (reload, show canvas)
 'use client';
 
 import { Message, MessageActions } from '@/components/ui/message';
