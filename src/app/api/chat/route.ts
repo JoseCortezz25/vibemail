@@ -1,12 +1,41 @@
 import { createEmailTool } from '@/ai/tools';
-import { google } from '@ai-sdk/google';
-import { convertToModelMessages, streamText, UIMessage } from 'ai';
+import { Model } from '@/stores/model.store';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createOpenAI } from '@ai-sdk/openai';
+import {
+  convertToModelMessages,
+  LanguageModel,
+  streamText,
+  UIMessage
+} from 'ai';
+
+interface ChatRequest {
+  messages: UIMessage[];
+  currentModel: Model;
+  apiKey: string;
+}
+
+const getModel = (model: Model, apiKey: string): LanguageModel => {
+  const isGemini = model.includes('gemini');
+  if (isGemini) {
+    return createGoogleGenerativeAI({
+      apiKey
+    })(model);
+  }
+  return createOpenAI({
+    apiKey
+  })(model);
+};
 
 export async function POST(req: Request) {
   try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+    const { messages, currentModel, apiKey }: ChatRequest = await req.json();
+    console.log('MODEL', currentModel, apiKey);
+
+    const model = getModel(currentModel, apiKey);
+
     const result = streamText({
-      model: google('gemini-2.5-flash'),
+      model,
       system: `Actua como un expero desarrollador de emails. Te llamas Maily Agent o simplemente Maily. Tu mision es crear el template de un email usando la libreri React Email.
       El usuario te enviara un requerimiento y debes generar el template del email.
       Tienes que analizar el prompt del usuario y determinar su intención.

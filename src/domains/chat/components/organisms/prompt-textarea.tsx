@@ -12,6 +12,18 @@ import { DesignModeToggle } from '@/components/molecules/design-mode-toggle';
 import { PromptSubmitButton } from '@/components/molecules/prompt-submit-button';
 import { InputUploadFiles } from '@/components/molecules/input-upload-file';
 import { SelectedElementIndicator } from '@/components/molecules/selected-element-indicator';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { currentModel, Model } from '@/stores/model.store';
+import { Gemini, OpenAI } from '@/components/atoms/icons';
+import { SelectGroup } from '@radix-ui/react-select';
+import { useModelStore } from '@/stores/model.store';
 
 interface PromptTextareaProps {
   onSubmit: (message: string, files?: FileList) => void;
@@ -37,6 +49,7 @@ export function PromptTextarea({
     handleFileRemove,
     handleSubmit
   } = usePromptInput({ onSubmit });
+  const { model, setModel } = useModelStore();
 
   return (
     <PromptInput
@@ -72,6 +85,49 @@ export function PromptTextarea({
               />
             </PromptInputAction>
           )}
+
+          <PromptInputAction tooltip="Select elements">
+            <Select
+              value={model}
+              onValueChange={(value: string) => setModel(value as Model)}
+              defaultValue={currentModel}
+            >
+              <SelectTrigger className="w-[150px] cursor-pointer rounded-[10px] border-none bg-gray-100 p-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>OpenAI</SelectLabel>
+                  <SelectItem value={Model.GPT_5_1}>
+                    <OpenAI />
+                    GPT-5.1
+                  </SelectItem>
+                  <SelectItem value={Model.GPT_5_MINI}>
+                    <OpenAI />
+                    GPT-5.0 Mini
+                  </SelectItem>
+                  <SelectItem value={Model.GPT_5_NANO}>
+                    <OpenAI />
+                    GPT-5.0 Nano
+                  </SelectItem>
+
+                  <SelectLabel>Google</SelectLabel>
+                  <SelectItem value={Model.GEMINI_3_PRO_PREVIEW}>
+                    <Gemini />
+                    Gemini 3 Pro Preview
+                  </SelectItem>
+                  <SelectItem value={Model.GEMINI_2_5_PRO}>
+                    <Gemini />
+                    Gemini 2.5 Pro
+                  </SelectItem>
+                  <SelectItem value={Model.GEMINI_2_5_FLASH}>
+                    <Gemini />
+                    Gemini 2.5 Flash
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </PromptInputAction>
         </div>
 
         <PromptInputAction

@@ -82,6 +82,8 @@ export function MessageUser({
 
         <MessageFilesList files={filesAttachments} />
 
+        <div></div>
+
         {isEditing ? (
           <MessageEditForm
             value={editInput}

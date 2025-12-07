@@ -1,7 +1,9 @@
+import { ReactNode } from 'react';
+
 interface EmptyStateMessageProps {
   title: string;
   description?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }
 
 export function EmptyStateMessage({

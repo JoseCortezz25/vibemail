@@ -7,11 +7,12 @@ import { MessageAssistant } from './message-assistant';
 import { ChatEmptyState } from '../molecules/chat-empty-state';
 import { ChatRequestOptions, FileUIPart, UIMessage } from 'ai';
 import { cn } from '@/lib/utils';
+import { MessageError } from '../atoms/message-error';
 
 interface ConversationProps {
   messages: UIMessage[];
   status: 'submitted' | 'streaming' | 'ready' | 'error';
-  error: Error | undefined;
+  error: { error: Error | undefined; message: string };
   onEdit: (id: string, newText: string, newImages?: FileUIPart[]) => void;
   onDelete: (id: string) => void;
   onShowCanvas: (isShowing: boolean) => void;
@@ -69,19 +70,13 @@ export const Conversation = ({
               );
             })}
 
-            {error && (
-              <div className="flex items-center justify-center gap-2 rounded-md bg-red-100 p-2 text-red-950">
-                <p>An error occurred. {error.message}</p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    reload({ messageId: messages[messages.length - 1].id })
-                  }
-                  className="font-bold"
-                >
-                  Retry
-                </button>
-              </div>
+            {error.error && (
+              <MessageError
+                error={error.message}
+                reload={() =>
+                  reload({ messageId: messages[messages.length - 1].id })
+                }
+              />
             )}
 
             {isLoading && messages.length > 0 && (

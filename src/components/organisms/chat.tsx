@@ -5,48 +5,64 @@ import { UIMessage, useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
 import { useVisualEditStore } from '@/stores/visual-edit.store';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { createFileParts } from '@/lib/utils';
 import { toast } from 'sonner';
 import { VisualEdits } from '@/domains/visual-editing/components/organisms/element-properties-panel';
-import { FileUIPart } from 'ai';
+import { DefaultChatTransport, FileUIPart } from 'ai';
+import { useModelStore } from '@/stores/model.store';
 
 export const Chat = () => {
   const { setIsLoading, setEmail, htmlBody } = useEmailStore();
-  const { selectedElement, isEditMode, setEditMode } = useVisualEditStore();
-  const { messages, sendMessage, status, setMessages, regenerate } = useChat({
-    onToolCall: async ({ toolCall }) => {
-      if (toolCall.toolName === 'createEmail') {
-        setIsLoading(true);
-      }
-    },
-    onFinish: async ({ message }) => {
-      const parts = message.parts;
-
-      parts.map(part => {
-        if (part.type === 'tool-createEmail') {
-          const output = part.output as {
-            subject: string;
-            jsxBody: string;
-            htmlBody: string;
-          };
-          setEmail({
-            subject: output.subject,
-            jsxBody: output.jsxBody,
-            htmlBody: output.htmlBody
-          });
-          setIsLoading(false);
+  const { selectedElement, isEditMode, setEditMode, deselectElement } =
+    useVisualEditStore();
+  const { model } = useModelStore();
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const { messages, sendMessage, status, setMessages, regenerate, error } =
+    useChat({
+      transport: new DefaultChatTransport({
+        body: () => ({
+          currentModel: model
+        })
+      }),
+      onToolCall: async ({ toolCall }) => {
+        if (toolCall.toolName === 'createEmail') {
+          setIsLoading(true);
         }
-      });
-    },
-    onData: async ({ data }) => {
-      console.log('data', data);
-    },
-    onError: error => {
-      console.log('error', error);
-      toast.error('Error generating email. Try again later.');
-    }
-  });
+      },
+      onFinish: async ({ message }) => {
+        const parts = message.parts;
+
+        parts.map(part => {
+          if (part.type === 'tool-createEmail') {
+            const output = part.output as {
+              subject: string;
+              jsxBody: string;
+              htmlBody: string;
+            };
+            setEmail({
+              subject: output.subject,
+              jsxBody: output.jsxBody,
+              htmlBody: output.htmlBody
+            });
+            setIsLoading(false);
+          }
+        });
+      },
+      onData: async ({ data }) => {
+        console.log('data', data);
+      },
+      onError: error => {
+        toast.error('Error generating email. Try again later.');
+
+        if (error.message.includes('Google Generative AI API key is missing')) {
+          setErrorMessage('Google Gemini API key is missing.');
+          return;
+        }
+
+        setErrorMessage('Error generating email. Try again later.');
+      }
+    });
 
   const isLoading = status === 'submitted' || status === 'streaming';
 
@@ -55,13 +71,16 @@ export const Chat = () => {
     let finalPrompt = prompt;
 
     if (selectedElement) {
-      const elementContext = `[Selected Element Context]
+      const elementContext = `<selected-element>
       Type: ${selectedElement.type}
       Code: ${selectedElement.code}
-
-      [User Request]
+      </  selected-element>
+      
       ${prompt}`;
       finalPrompt = elementContext;
+
+      setEditMode(false);
+      deselectElement();
     }
 
     if (images) {
@@ -102,14 +121,14 @@ export const Chat = () => {
   );
 
   return (
-    <div className="border-border relative flex h-full min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 lg:min-h-[calc(100dvh-57px)] lg:border-r">
+    <div className="border-border relative flex h-full max-h-[calc(100dvh-73px)] min-h-[calc(100dvh-73px)] w-full flex-col items-center justify-between p-2 md:max-h-[calc(100dvh-57px)] md:min-h-[calc(100dvh-57px)] lg:border-r">
       {selectedElement ? (
         <VisualEdits />
       ) : (
         <Conversation
           messages={messages}
           status={status}
-          error={undefined}
+          error={{ error, message: errorMessage }}
           reload={regenerate}
           onEdit={handleEdit}
           onDelete={handleDelete}
