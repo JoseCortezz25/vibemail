@@ -1,28 +1,27 @@
 import { generatedEmailSchema } from '@/lib/schema';
+import { Model } from '@/stores/model.store';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateObject, ModelMessage, tool } from 'ai';
 import { z } from 'zod';
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
-});
+export const createEmailTool = (model: Model, apiKey: string) =>
+  tool({
+    description: 'Crea el template del email',
+    inputSchema: z.object({
+      prompt: z
+        .string()
+        .describe(
+          'El prompt para crear el template del email. El prompt se creo con base a la conversacion con el usuario.'
+        )
+    }),
+    execute: async ({ prompt }, { messages }) => {
+      try {
+        const allMessages: ModelMessage[] = [];
+        const google = createGoogleGenerativeAI({ apiKey });
 
-export const createEmailTool = tool({
-  description: 'Crea el template del email',
-  inputSchema: z.object({
-    prompt: z
-      .string()
-      .describe(
-        'El prompt para crear el template del email. El prompt se creo con base a la conversacion con el usuario.'
-      )
-  }),
-  execute: async ({ prompt }, { messages }) => {
-    try {
-      const allMessages: ModelMessage[] = [];
-
-      const result = await generateObject({
-        model: google('gemini-2.5-flash'),
-        system: `You are an expert email developer, expert in email marketing and AI assistant. Tu tarea es crear el template de un email usando la libreria React Email.
+        const result = await generateObject({
+          model: google(model),
+          system: `You are an expert email developer, expert in email marketing and AI assistant. Tu tarea es crear el template de un email usando la libreria React Email.
 
         Instrucciones:
         - Debes generar el temaplte del email siguiendo las mejores prácticas de email marketing.
@@ -66,23 +65,22 @@ export const createEmailTool = tool({
         https://placehold.co/600x400@2x.png
         </placeholder-image>
         `,
-        messages: [
-          ...messages,
-          ...allMessages,
-          { role: 'user', content: 'Request from user: ' + prompt }
-        ],
-        schema: generatedEmailSchema
-      });
+          messages: [
+            ...messages,
+            ...allMessages,
+            { role: 'user', content: 'Request from user: ' + prompt }
+          ],
+          schema: generatedEmailSchema
+        });
 
-      console.log('EMAIL GENERATE:', result);
-      return result.object;
-      // return `Email generated successfully. This is the subject: ${email.subject} and this is the html body: ${email.htmlBody}`;
-    } catch (error) {
-      console.log('Error generating email:', error);
-      return `Error generating email: ${error}`;
+        console.log('EMAIL GENERATE:', result);
+        return result.object;
+      } catch (error) {
+        console.log('Error generating email:', error);
+        return `Error generating email: ${error}`;
+      }
     }
-  }
-});
+  });
 
 export const modifyEmailTool = tool({
   description: 'Modify the email template',

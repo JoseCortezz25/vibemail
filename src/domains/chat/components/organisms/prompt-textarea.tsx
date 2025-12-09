@@ -49,7 +49,10 @@ export function PromptTextarea({
     handleFileRemove,
     handleSubmit
   } = usePromptInput({ onSubmit });
-  const { model, setModel } = useModelStore();
+  const { model, setModel, hasHydrated } = useModelStore();
+
+  // Use currentModel as fallback until hydration completes
+  const displayModel = hasHydrated ? model : currentModel;
 
   return (
     <PromptInput
@@ -86,11 +89,10 @@ export function PromptTextarea({
             </PromptInputAction>
           )}
 
-          <PromptInputAction tooltip="Select elements">
+          <PromptInputAction tooltip="Select model">
             <Select
-              value={model}
+              value={displayModel}
               onValueChange={(value: string) => setModel(value as Model)}
-              defaultValue={currentModel}
             >
               <SelectTrigger className="w-[150px] cursor-pointer rounded-[10px] border-none bg-gray-100 p-2">
                 <SelectValue />
@@ -116,13 +118,13 @@ export function PromptTextarea({
                     <Gemini />
                     Gemini 3 Pro Preview
                   </SelectItem>
-                  <SelectItem value={Model.GEMINI_2_5_PRO}>
+                  <SelectItem value={Model.GEMINI_FLASH_LATEST}>
                     <Gemini />
-                    Gemini 2.5 Pro
+                    Gemini Flash
                   </SelectItem>
-                  <SelectItem value={Model.GEMINI_2_5_FLASH}>
+                  <SelectItem value={Model.GEMINI_FLASH_LITE_LATEST}>
                     <Gemini />
-                    Gemini 2.5 Flash
+                    Gemini Flash Lite
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>

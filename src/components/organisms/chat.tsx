@@ -5,7 +5,7 @@ import { UIMessage, useChat } from '@ai-sdk/react';
 import { Conversation } from './conversation';
 import { useEmailStore } from '@/stores/email.store';
 import { useVisualEditStore } from '@/stores/visual-edit.store';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { createFileParts } from '@/lib/utils';
 import { toast } from 'sonner';
 import { VisualEdits } from '@/domains/visual-editing/components/organisms/element-properties-panel';
@@ -16,13 +16,27 @@ export const Chat = () => {
   const { setIsLoading, setEmail, htmlBody } = useEmailStore();
   const { selectedElement, isEditMode, setEditMode, deselectElement } =
     useVisualEditStore();
-  const { model } = useModelStore();
+  const { model, apiKey, hasHydrated } = useModelStore();
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Use refs to keep updated values accessible in the transport closure
+  const modelRef = useRef(model);
+  const apiKeyRef = useRef(apiKey);
+
+  // Keep refs in sync with current values (only after hydration)
+  useEffect(() => {
+    if (hasHydrated) {
+      modelRef.current = model;
+      apiKeyRef.current = apiKey;
+    }
+  }, [model, apiKey, hasHydrated]);
+
   const { messages, sendMessage, status, setMessages, regenerate, error } =
     useChat({
       transport: new DefaultChatTransport({
         body: () => ({
-          currentModel: model
+          currentModel: modelRef.current,
+          modelApiKey: apiKeyRef.current
         })
       }),
       onToolCall: async ({ toolCall }) => {
@@ -53,10 +67,24 @@ export const Chat = () => {
         console.log('data', data);
       },
       onError: error => {
+        console.log('error', error);
         toast.error('Error generating email. Try again later.');
 
         if (error.message.includes('Google Generative AI API key is missing')) {
           setErrorMessage('Google Gemini API key is missing.');
+          return;
+        }
+
+        if (error.message.includes('You exceeded your current quota')) {
+          setErrorMessage('You exceeded your current quota.');
+          return;
+        }
+
+        if (
+          error.message.includes('Incorrect API key provided') ||
+          error.message.includes('API key not valid')
+        ) {
+          setErrorMessage('Incorrect API key provided.');
           return;
         }
 

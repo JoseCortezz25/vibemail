@@ -12,27 +12,28 @@ import {
 interface ChatRequest {
   messages: UIMessage[];
   currentModel: Model;
-  apiKey: string;
+  modelApiKey: string;
 }
 
-const getModel = (model: Model, apiKey: string): LanguageModel => {
+const getModel = (model: Model, modelApiKey: string): LanguageModel => {
   const isGemini = model.includes('gemini');
   if (isGemini) {
     return createGoogleGenerativeAI({
-      apiKey
+      apiKey: modelApiKey
     })(model);
   }
   return createOpenAI({
-    apiKey
+    apiKey: modelApiKey
   })(model);
 };
 
 export async function POST(req: Request) {
   try {
-    const { messages, currentModel, apiKey }: ChatRequest = await req.json();
-    console.log('MODEL', currentModel, apiKey);
+    const { messages, currentModel, modelApiKey }: ChatRequest =
+      await req.json();
 
-    const model = getModel(currentModel, apiKey);
+    const model = getModel(currentModel, modelApiKey);
+    const createEmailToolFunction = createEmailTool(currentModel, modelApiKey);
 
     const result = streamText({
       model,
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
       `,
       messages: convertToModelMessages(messages),
       tools: {
-        createEmail: createEmailTool
+        createEmail: createEmailToolFunction
       }
     });
 
