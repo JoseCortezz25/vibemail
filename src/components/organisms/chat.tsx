@@ -63,12 +63,19 @@ export const Chat = () => {
           }
         });
       },
-      onData: async ({ data }) => {
-        console.log('data', data);
-      },
       onError: error => {
         console.log('error', error);
         toast.error('Error generating email. Try again later.');
+
+        if (
+          error.message.includes('Please use API Key') ||
+          apiKeyRef.current === ''
+        ) {
+          setErrorMessage(
+            'You have not configured your API key. Please go to settings and configure your API key.'
+          );
+          return;
+        }
 
         if (error.message.includes('Google Generative AI API key is missing')) {
           setErrorMessage('Google Gemini API key is missing.');
@@ -102,7 +109,7 @@ export const Chat = () => {
       const elementContext = `<selected-element>
       Type: ${selectedElement.type}
       Code: ${selectedElement.code}
-      </  selected-element>
+      </selected-element>
       
       ${prompt}`;
       finalPrompt = elementContext;

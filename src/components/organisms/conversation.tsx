@@ -80,7 +80,7 @@ export const Conversation = ({
             )}
 
             {isLoading && messages.length > 0 && (
-              <div className="group min-h-scroll-anchor mx-auto mt-[20px] flex w-full max-w-3xl flex-col items-start gap-2 px-2 pb-2">
+              <div className="group min-h-scroll-anchor mx-auto mt-[20px] flex w-full max-w-3xl flex-col items-start gap-2 px-2 pb-10">
                 <TextShimmerWave className="font-mono text-sm" duration={1}>
                   Cooking email...
                 </TextShimmerWave>

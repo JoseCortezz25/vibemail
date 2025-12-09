@@ -60,7 +60,7 @@ export function PromptTextarea({
       onValueChange={setInput}
       isLoading={isLoading}
       onSubmit={handleSubmit}
-      className="w-full max-w-(--breakpoint-md) rounded-[10px]"
+      className="w-full max-w-(--breakpoint-md) rounded-[10px] shadow-[1px_1px_5px_#d1d1d1]"
     >
       <SelectedElementIndicator />
 
@@ -78,16 +78,6 @@ export function PromptTextarea({
           <PromptInputAction tooltip="Attach files">
             <InputUploadFiles setFiles={setFiles} fileInputRef={fileInputRef} />
           </PromptInputAction>
-
-          {hasHtmlBody && (
-            <PromptInputAction tooltip="Select elements">
-              <DesignModeToggle
-                isEditMode={isEditMode}
-                isDisabled={isLoading}
-                onToggle={onToggleEditMode}
-              />
-            </PromptInputAction>
-          )}
 
           <PromptInputAction tooltip="Select model">
             <Select
@@ -130,12 +120,26 @@ export function PromptTextarea({
               </SelectContent>
             </Select>
           </PromptInputAction>
+
+          {hasHtmlBody && (
+            <PromptInputAction tooltip="Select elements">
+              <DesignModeToggle
+                isEditMode={isEditMode}
+                isDisabled={isLoading}
+                onToggle={onToggleEditMode}
+              />
+            </PromptInputAction>
+          )}
         </div>
 
         <PromptInputAction
           tooltip={isLoading ? 'Stop generation' : 'Send message'}
         >
-          <PromptSubmitButton isLoading={isLoading} onSubmit={handleSubmit} />
+          <PromptSubmitButton
+            isLoading={isLoading}
+            onSubmit={handleSubmit}
+            disabled={isLoading || input.length === 0}
+          />
         </PromptInputAction>
       </PromptInputActions>
     </PromptInput>

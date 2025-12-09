@@ -95,6 +95,7 @@ export function MessageUser({
         ) : (
           <MessageContent
             ref={contentRef}
+            markdown={true}
             className="text-foreground rounded-[15px] !rounded-tr-[0px] bg-gray-100/60 px-[16px] py-[12px]"
           >
             {textContent}
