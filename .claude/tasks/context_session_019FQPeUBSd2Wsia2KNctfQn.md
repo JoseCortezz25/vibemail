@@ -222,3 +222,57 @@ When appending a new entry, use this format:
 **Session Status**: 🟡 Paused (waiting for user approval to begin implementation)
 
 ---
+## [2025-12-09 23:30] parent-agent: Plan Corrected to Follow shadcn/ui Pattern
+
+**Task**: Corrected implementation approach to use shadcn/ui official pattern with next-themes
+
+**Status**: ✅ Completed
+
+**Plan Location**: `.claude/plans/implementation-dark-mode-SHADCN-019FQPeUBSd2Wsia2KNctfQn.md`
+
+**Problem Identified**:
+- Original plan created custom Zustand solution (~200 lines)
+- Missed that shadcn/ui has official pattern using `next-themes`
+- Custom solution was over-engineered for this use case
+
+**Key Changes**:
+- Use `next-themes` package (shadcn/ui official recommendation)
+- Much simpler: ~50-80 lines vs ~200 lines
+- FOUC prevention built-in (no custom script needed)
+- Community-maintained package vs custom code
+- Follows shadcn/ui documentation exactly
+
+**New Approach**:
+1. Install `next-themes` package
+2. Create simple ThemeProvider wrapper (~10 lines)
+3. Update layout with provider + suppressHydrationWarning
+4. Add theme toggle in settings panel using `useTheme()` hook
+5. Define brand colors in globals.css (unchanged from original plan)
+
+**Files to Create** (updated):
+- `src/components/providers/theme-provider.tsx`: Simple wrapper (~10 lines)
+- `src/constants/theme-toggle.text-map.ts`: UI strings (unchanged)
+- Optional: `src/components/molecules/mode-toggle.tsx`: Standalone toggle
+
+**Files to Modify** (simplified):
+- `src/app/globals.css`: Add brand colors (unchanged)
+- `src/app/layout.tsx`: Add ThemeProvider + suppressHydrationWarning
+- `src/components/organisms/settings-panel.tsx`: Use useTheme() hook
+
+**Benefits**:
+- 75% less code to write and maintain
+- Built-in SSR handling and FOUC prevention
+- Official shadcn/ui pattern
+- Better long-term maintainability
+
+**UX Plan Still Valid**:
+- Color palette decisions remain the same ✅
+- Accessibility requirements unchanged ✅
+- Toggle design adapts to next-themes API ✅
+
+**Next Steps**:
+- User approval for corrected approach
+- Implement using next-themes pattern
+- Test functionality
+
+---
