@@ -134,3 +134,91 @@ When appending a new entry, use this format:
 ---
 
 <!-- Future entries will be appended below -->
+## [2025-12-09 22:55] parent-agent: UX/UI Design Plan Completed
+
+**Task**: Created comprehensive UX/UI design plan for dark mode implementation
+
+**Status**: ✅ Completed
+
+**Plan Location**: `.claude/plans/ux-dark-mode-plan-019FQPeUBSd2Wsia2KNctfQn.md`
+
+**Key Decisions**:
+- Brand colors for dark mode: red (#ff5757), blue (#7b8ae8), blue-dark (#4a5fc9) - adjusted for proper contrast and reduced eye strain
+- Black scale semantic inversion: black-50 becomes darkest (#0d0d0d) in dark mode, black-950 becomes lightest (#f5f5f5)
+- Theme toggle in settings panel using shadcn Tabs component (Light/Dark/System)
+- Instant transition (no animation) for accessibility and cleaner UX
+- All colors meet WCAG 2.1 AA contrast ratios
+
+**Files Planned**:
+- `src/app/globals.css`: Add dark mode color variants
+- `src/components/organisms/settings-panel.tsx`: Add theme toggle UI
+- `src/constants/theme-toggle.text-map.ts`: UI strings for toggle
+
+**Next Steps**:
+- Domain architecture plan for theme state management
+- Implementation plan consolidation
+
+---
+
+## [2025-12-09 23:00] parent-agent: Domain Architecture Plan Completed
+
+**Task**: Created domain architecture plan for theme state management
+
+**Status**: ✅ Completed
+
+**Plan Location**: `.claude/plans/domain-theme-plan-019FQPeUBSd2Wsia2KNctfQn.md`
+
+**Key Decisions**:
+- Use Zustand store (`/src/stores/theme.store.ts`) - theme is UI state, not business logic
+- Three theme options: Light, Dark, System (follows OS preference)
+- FOUC prevention via blocking script in layout head
+- SSR-safe localStorage wrapper pattern (matching existing model.store.ts)
+- ThemeProvider client component for reactive theme application and system preference listener
+- Text externalization in `theme-toggle.text-map.ts` per project constraints
+
+**Files to Create**:
+- `src/stores/theme.store.ts`: Zustand theme store with persist
+- `src/components/providers/theme-provider.tsx`: Client component for theme logic
+- `src/constants/theme-toggle.text-map.ts`: All UI strings
+
+**Files to Modify**:
+- `src/app/layout.tsx`: Add FOUC script, wrap in ThemeProvider
+- `src/components/organisms/settings-panel.tsx`: Add theme toggle section
+
+**Next Steps**:
+- Create consolidated implementation plan
+- Begin implementation
+
+---
+## [2025-12-09 23:10] parent-agent: Implementation Plan Completed
+
+**Task**: Created consolidated implementation plan with all phases and steps
+
+**Status**: ✅ Completed
+
+**Plan Location**: `.claude/plans/implementation-dark-mode-plan-019FQPeUBSd2Wsia2KNctfQn.md`
+
+**Key Decisions**:
+- 7-phase implementation: Colors → Store → Provider → Text Map → Layout → Settings → Component Updates
+- Total ~200 lines of new code across 3 new files + 3 modified files
+- Estimated 2-3 hours development + 1 hour testing
+- Phased approach allows incremental testing
+
+**Files Summary**:
+- CREATE: `theme.store.ts`, `theme-provider.tsx`, `theme-toggle.text-map.ts`
+- MODIFY: `globals.css`, `layout.tsx`, `settings-panel.tsx`
+
+**Implementation Order**:
+1. Fundamentos (colors, store, provider, text map)
+2. Integración (layout, settings panel)
+3. Testing (funcionalidad, accesibilidad, FOUC)
+4. Refinamiento opcional (component updates)
+
+**Next Steps**:
+- User to review plans and approve approach
+- Begin implementation following consolidated plan
+- Test each phase before moving to next
+
+**Session Status**: 🟡 Paused (waiting for user approval to begin implementation)
+
+---
