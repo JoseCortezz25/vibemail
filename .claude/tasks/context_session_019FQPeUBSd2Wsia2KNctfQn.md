@@ -276,3 +276,31 @@ When appending a new entry, use this format:
 - Test functionality
 
 ---
+## [2025-12-09 23:40] parent-agent: Cleaned Up Obsolete Plans
+
+**Task**: Removed obsolete custom implementation plans from repository
+
+**Status**: ✅ Completed
+
+**Files Removed**:
+- `.claude/plans/domain-theme-plan-019FQPeUBSd2Wsia2KNctfQn.md` (Zustand custom store)
+- `.claude/plans/implementation-dark-mode-plan-019FQPeUBSd2Wsia2KNctfQn.md` (custom ~200 line solution)
+
+**Files Retained**:
+- `.claude/plans/ux-dark-mode-plan-019FQPeUBSd2Wsia2KNctfQn.md` ✅ (color decisions valid)
+- `.claude/plans/implementation-dark-mode-SHADCN-019FQPeUBSd2Wsia2KNctfQn.md` ✅ (corrected approach)
+
+**Rationale**:
+- Avoid confusion between old custom approach and new official pattern
+- Keep only relevant, actionable plans
+- UX decisions (colors, accessibility) remain unchanged
+
+**Current State**:
+- Clean repository with only shadcn/ui official pattern
+- Ready for implementation approval
+
+**Next Steps**:
+- User review and approval
+- Begin implementation with next-themes
+
+---
