@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Gemini, OpenAI } from '@/components/atoms/icons';
+import { Badge } from '@/components/ui/badge';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -102,6 +103,18 @@ export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>OpenAI</SelectLabel>
+                  <SelectItem value={Model.GPT_5_2}>
+                    <div className="flex items-center gap-2">
+                      <OpenAI />
+                      <span>GPT-5.2</span>
+                      <Badge
+                        variant="outline"
+                        className="border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200"
+                      >
+                        new
+                      </Badge>
+                    </div>
+                  </SelectItem>
                   <SelectItem value={Model.GPT_5_1}>
                     <OpenAI />
                     GPT-5.1

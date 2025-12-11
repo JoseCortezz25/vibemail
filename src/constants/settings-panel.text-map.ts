@@ -16,7 +16,8 @@ export const settingsPanelTextMap = {
 
   // Model options
   models: {
-    'gpt-5.1-2025-11-13': 'GPT-5.1 (Latest)',
+    'gpt-5.2-2025-12-11': 'GPT-5.2 (Latest)',
+    'gpt-5.1-2025-11-13': 'GPT-5.1',
     'gpt-5-mini-2025-08-07': 'GPT-5 Mini',
     'gpt-5-nano-2025-08-07': 'GPT-5 Nano',
     'gemini-3-pro-preview': 'Gemini 3 Pro (Preview)',

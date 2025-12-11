@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 export enum Model {
+  GPT_5_2 = 'gpt-5.2-2025-12-11',
   GPT_5_1 = 'gpt-5.1-2025-11-13',
   GPT_5_MINI = 'gpt-5-mini-2025-08-07',
   GPT_5_NANO = 'gpt-5-nano-2025-08-07',
