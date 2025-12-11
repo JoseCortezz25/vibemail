@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { useModelStore, Model } from '@/stores/model.store';
 import { settingsPanelTextMap } from '@/constants/settings-panel.text-map';
+import { themeToggleTextMap } from '@/constants/theme-toggle.text-map';
 import {
   Sheet,
   SheetContent,
@@ -20,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -34,9 +37,11 @@ interface SettingsPanelProps {
 
 export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
   const { model, apiKey, hasHydrated, setModel, setApiKey } = useModelStore();
+  const { theme, setTheme } = useTheme();
 
   const [localModel, setLocalModel] = useState(model);
   const [localApiKey, setLocalApiKey] = useState(apiKey);
+  const [mounted, setMounted] = useState(false);
 
   // Sync local state with store when panel opens or hydration completes
   useEffect(() => {
@@ -45,6 +50,11 @@ export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
       setLocalApiKey(apiKey);
     }
   }, [isOpen, model, apiKey, hasHydrated]);
+
+  // Prevent hydration mismatch for theme
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSave = () => {
     // Validation
@@ -153,6 +163,40 @@ export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
               {settingsPanelTextMap.apiKeyHelper}
             </p>
           </div>
+
+          {/* Theme Selection */}
+          {mounted && (
+            <div className="flex flex-col gap-2">
+              <Label>{themeToggleTextMap.sectionLabel}</Label>
+              <Tabs value={theme} onValueChange={(value) => setTheme(value)}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger
+                    value="light"
+                    aria-label={themeToggleTextMap.themeLightAriaLabel}
+                  >
+                    {themeToggleTextMap.themeLightLabel}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="dark"
+                    aria-label={themeToggleTextMap.themeDarkAriaLabel}
+                  >
+                    {themeToggleTextMap.themeDarkLabel}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="system"
+                    aria-label={themeToggleTextMap.themeSystemAriaLabel}
+                  >
+                    {themeToggleTextMap.themeSystemLabel}
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {theme === 'system' && (
+                <p className="text-muted-foreground text-xs">
+                  {themeToggleTextMap.themeSystemHelper}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-2">

@@ -205,6 +205,25 @@
   --sidebar-border: oklch(1 0 0);
   --sidebar-ring: oklch(0.4386 0 0);
   --destructive-foreground: oklch(0.2686 0 0);
+
+  /* BRAND COLORS - Custom project colors for dark mode */
+  --color-brand-red: #ff5757;
+  --color-brand-blue: #7b8ae8;
+  --color-brand-blue-dark: #4a5fc9;
+
+  /* BLACK SCALE - Semantic inversion for dark mode */
+  --color-black-50: #0d0d0d;
+  --color-black-100: #131313;
+  --color-black-200: #191919;
+  --color-black-300: #202020;
+  --color-black-400: #2e2e2e;
+  --color-black-500: #3b3b3b;
+  --color-black-600: #545454;
+  --color-black-700: #6e6e6e;
+  --color-black-800: #8c8c8c;
+  --color-black-900: #dcdcdc;
+  --color-black-950: #f5f5f5;
+
   --radius: 0rem;
   --font-sans: Geist Mono, monospace;
   --font-serif: Geist Mono, monospace;
