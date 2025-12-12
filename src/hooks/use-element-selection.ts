@@ -138,12 +138,7 @@ export const useElementSelection = (
   // Handle element click
   const handleElementClick = useCallback(
     (event: MouseEvent) => {
-      debugger;
-
-      console.log('🖱️ Click detected in iframe', { isEditMode });
-
       if (!isEditMode) {
-        console.log('⚠️ Edit mode is disabled');
         return;
       }
 
@@ -154,18 +149,13 @@ export const useElementSelection = (
       event.preventDefault();
       event.stopPropagation();
 
-      console.log('🎯 Target element:', target.tagName, target);
-
       // Skip body and html
       if (target.tagName === 'BODY' || target.tagName === 'HTML') {
-        console.log('⚠️ Cannot select body or html');
         return;
       }
 
       // Select exactly the element under the cursor
       const element = target;
-
-      console.log('📍 Selected element:', element.tagName, element);
 
       // Generate or get element ID
       const vibeId = generateElementId(element);
