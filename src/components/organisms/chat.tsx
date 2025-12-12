@@ -11,6 +11,12 @@ import { toast } from 'sonner';
 import { VisualEdits } from '@/domains/visual-editing/components/organisms/element-properties-panel';
 import { DefaultChatTransport, FileUIPart } from 'ai';
 import { useModelStore } from '@/stores/model.store';
+import { useUIStore } from '@/stores/ui.store';
+import {
+  useFreeUsageStore,
+  FREE_LIMIT,
+  selectFreeUsed
+} from '@/stores/free-usage.store';
 
 export const Chat = () => {
   const { setIsLoading, setEmail, htmlBody } = useEmailStore();
@@ -18,10 +24,14 @@ export const Chat = () => {
     useVisualEditStore();
   const { model, apiKey, hasHydrated } = useModelStore();
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { setActiveView } = useUIStore();
+  const { registerEmail } = useFreeUsageStore();
+  const freeUsed = useFreeUsageStore(selectFreeUsed);
 
   // Use refs to keep updated values accessible in the transport closure
   const modelRef = useRef(model);
   const apiKeyRef = useRef(apiKey);
+  const isFreeModeRef = useRef(apiKey.trim() === '');
 
   // Keep refs in sync with current values (only after hydration)
   useEffect(() => {
@@ -36,7 +46,8 @@ export const Chat = () => {
       transport: new DefaultChatTransport({
         body: () => ({
           currentModel: modelRef.current,
-          modelApiKey: apiKeyRef.current
+          modelApiKey: apiKeyRef.current,
+          isFreeMode: isFreeModeRef.current
         })
       }),
       onToolCall: async ({ toolCall }) => {
@@ -60,12 +71,27 @@ export const Chat = () => {
               htmlBody: output.htmlBody
             });
             setIsLoading(false);
+            if (output.htmlBody) {
+              registerEmail(output.subject);
+            }
+
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (isMobile) {
+              setActiveView('preview');
+            }
           }
         });
       },
       onError: error => {
         console.log('error', error);
         toast.error('Error generating email. Try again later.');
+
+        if (error.message.includes('You exceeded your current quota')) {
+          setErrorMessage(
+            'You exceeded your current quota. Please review your usage and upgrade to a paid plan with your own API key.'
+          );
+          return;
+        }
 
         if (
           error.message.includes('Please use API Key') ||
@@ -178,6 +204,7 @@ export const Chat = () => {
         isLoading={isLoading}
         isEditMode={isEditMode}
         hasHtmlBody={!!htmlBody}
+        isDisabled={freeUsed >= FREE_LIMIT}
         onToggleEditMode={() => setEditMode(!isEditMode)}
       />
     </div>

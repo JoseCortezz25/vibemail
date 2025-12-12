@@ -3,6 +3,12 @@ export const settingsPanelTextMap = {
   title: 'Settings',
   description: 'Configure your AI model and API key preferences',
 
+  // Free tier
+  freeTierTitle: 'Free tier',
+  freeTierDescription:
+    'Includes 10 free from-scratch generations using our shared API key (Gemini only).',
+  freeTierLimitReached: 'Limit reached. Add your API key to continue.',
+
   // Form labels
   modelLabel: 'AI Model',
   modelPlaceholder: 'Select an AI model',
@@ -33,7 +39,6 @@ export const settingsPanelTextMap = {
   // Feedback messages
   saveSuccess: 'Settings saved successfully',
   saveError: 'Failed to save settings. Please try again.',
-  validationErrorApiKey: 'API key is required',
   validationErrorModel: 'Please select a model',
 
   // Empty states

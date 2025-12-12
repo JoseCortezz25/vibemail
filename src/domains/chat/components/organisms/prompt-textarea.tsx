@@ -25,12 +25,14 @@ import { Gemini, OpenAI } from '@/components/atoms/icons';
 import { SelectGroup } from '@radix-ui/react-select';
 import { useModelStore } from '@/stores/model.store';
 import { Badge } from '@/components/ui/badge';
+import { AlertCircle } from 'lucide-react';
 
 interface PromptTextareaProps {
   onSubmit: (message: string, files?: FileList) => void;
   isLoading: boolean;
   isEditMode: boolean;
   hasHtmlBody: boolean;
+  isDisabled?: boolean;
   onToggleEditMode: () => void;
 }
 
@@ -39,6 +41,7 @@ export function PromptTextarea({
   isLoading,
   isEditMode,
   hasHtmlBody,
+  isDisabled = false,
   onToggleEditMode
 }: PromptTextareaProps) {
   const {
@@ -50,7 +53,7 @@ export function PromptTextarea({
     handleFileRemove,
     handleSubmit
   } = usePromptInput({ onSubmit });
-  const { model, setModel, hasHydrated } = useModelStore();
+  const { model, setModel, hasHydrated, apiKey } = useModelStore();
 
   // Use currentModel as fallback until hydration completes
   const displayModel = hasHydrated ? model : currentModel;
@@ -61,8 +64,19 @@ export function PromptTextarea({
       onValueChange={setInput}
       isLoading={isLoading}
       onSubmit={handleSubmit}
+      disabled={isDisabled}
       className="w-full max-w-(--breakpoint-md) rounded-[10px] shadow-[1px_1px_5px_#d1d1d1]"
     >
+      {isDisabled && apiKey.trim() === '' && (
+        <div className="mb-2 flex items-center gap-3 rounded-[8px] bg-red-200/20 p-2">
+          <AlertCircle className="size-4 text-red-500" />
+          <p className="text-sm text-red-500">
+            You have reached your free limit. Please add your API key to
+            continue.
+          </p>
+        </div>
+      )}
+
       <SelectedElementIndicator />
 
       {files && (
@@ -151,7 +165,7 @@ export function PromptTextarea({
           <PromptSubmitButton
             isLoading={isLoading}
             onSubmit={handleSubmit}
-            disabled={isLoading || input.length === 0}
+            disabled={isLoading || isDisabled || input.length === 0}
           />
         </PromptInputAction>
       </PromptInputActions>

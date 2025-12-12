@@ -13,27 +13,40 @@ interface ChatRequest {
   messages: UIMessage[];
   currentModel: Model;
   modelApiKey: string;
+  isFreeMode: boolean;
 }
 
-const getModel = (model: Model, modelApiKey: string): LanguageModel => {
+const getModel = (
+  model: Model,
+  isFreeMode: boolean,
+  apiKey: string
+): LanguageModel => {
   const isGemini = model.includes('gemini');
-  if (isGemini) {
-    return createGoogleGenerativeAI({
-      apiKey: modelApiKey
-    })(model);
+
+  if (isGemini || isFreeMode) {
+    return createGoogleGenerativeAI({ apiKey })(model);
   }
-  return createOpenAI({
-    apiKey: modelApiKey
-  })(model);
+  return createOpenAI({ apiKey })(model);
+};
+
+const getApiKey = (isFreeMode: boolean, modelApiKey?: string) => {
+  if (isFreeMode) {
+    return process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  }
+  return modelApiKey || '';
 };
 
 export async function POST(req: Request) {
   try {
-    const { messages, currentModel, modelApiKey }: ChatRequest =
+    const { messages, currentModel, modelApiKey, isFreeMode }: ChatRequest =
       await req.json();
 
-    const model = getModel(currentModel, modelApiKey);
-    const createEmailToolFunction = createEmailTool(currentModel, modelApiKey);
+    const apiKey = getApiKey(isFreeMode, modelApiKey);
+    if (!apiKey) {
+      throw new Error('API key is required');
+    }
+    const model = getModel(currentModel, isFreeMode, apiKey);
+    const createEmailToolFunction = createEmailTool(currentModel, apiKey);
 
     const result = streamText({
       model,
@@ -80,6 +93,8 @@ export async function POST(req: Request) {
     return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error('Error generating email:', error);
-    return new Response('Error generating email', { status: 500 });
+    const message =
+      error instanceof Error ? error.message : 'Error generating email';
+    return new Response(message, { status: 500 });
   }
 }

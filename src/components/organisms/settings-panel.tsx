@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useModelStore, Model } from '@/stores/model.store';
 import { settingsPanelTextMap } from '@/constants/settings-panel.text-map';
+import { useFreeUsageStore, selectFreeUsed } from '@/stores/free-usage.store';
 import {
   Sheet,
   SheetContent,
@@ -35,6 +36,8 @@ interface SettingsPanelProps {
 
 export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
   const { model, apiKey, hasHydrated, setModel, setApiKey } = useModelStore();
+  const { freeLimit } = useFreeUsageStore();
+  const freeUsed = useFreeUsageStore(selectFreeUsed);
 
   const [localModel, setLocalModel] = useState(model);
   const [localApiKey, setLocalApiKey] = useState(apiKey);
@@ -51,11 +54,6 @@ export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
     // Validation
     if (!localModel) {
       toast.error(settingsPanelTextMap.validationErrorModel);
-      return;
-    }
-
-    if (!localApiKey.trim()) {
-      toast.error(settingsPanelTextMap.validationErrorApiKey);
       return;
     }
 
@@ -85,6 +83,28 @@ export const SettingsPanel = ({ isOpen, onOpenChange }: SettingsPanelProps) => {
         </SheetHeader>
 
         <div className="flex flex-col gap-6 px-4 py-4">
+          {/* Free tier callout - only show when no API key */}
+          {hasHydrated && apiKey.trim() === '' && (
+            <div className="border-border bg-muted/50 flex flex-col gap-1 rounded-lg border p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium">
+                  {settingsPanelTextMap.freeTierTitle}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {freeUsed}/{freeLimit} used • {freeLimit - freeUsed} remaining
+                </p>
+              </div>
+              <p className="text-muted-foreground text-xs">
+                {settingsPanelTextMap.freeTierDescription}
+              </p>
+              {freeUsed >= freeLimit && (
+                <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                  {settingsPanelTextMap.freeTierLimitReached}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Model Selection */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="model-select">

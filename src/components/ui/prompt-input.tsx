@@ -50,6 +50,7 @@ type PromptInputProps = {
   onValueChange?: (value: string) => void;
   maxHeight?: number | string;
   onSubmit?: () => void;
+  disabled?: boolean;
   children: React.ReactNode;
   className?: string;
 };
@@ -61,6 +62,7 @@ function PromptInput({
   value,
   onValueChange,
   onSubmit,
+  disabled = false,
   children
 }: PromptInputProps) {
   const [internalValue, setInternalValue] = useState(value || '');
@@ -80,6 +82,7 @@ function PromptInput({
           setValue: onValueChange ?? handleChange,
           maxHeight,
           onSubmit,
+          disabled,
           textareaRef
         }}
       >
@@ -88,7 +91,9 @@ function PromptInput({
             'border-input bg-background cursor-text rounded-3xl border p-2 shadow-xs',
             className
           )}
-          onClick={() => textareaRef.current?.focus()}
+          onClick={() => {
+            if (!disabled) textareaRef.current?.focus();
+          }}
         >
           {children}
         </div>
