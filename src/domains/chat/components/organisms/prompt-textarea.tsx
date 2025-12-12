@@ -65,7 +65,7 @@ export function PromptTextarea({
       isLoading={isLoading}
       onSubmit={handleSubmit}
       disabled={isDisabled}
-      className="w-full max-w-(--breakpoint-md) rounded-[10px] shadow-[1px_1px_5px_#d1d1d1]"
+      className="w-full max-w-(--breakpoint-md) rounded-[12px] shadow-[1px_1px_5px_#d1d1d1ba]"
     >
       {isDisabled && apiKey.trim() === '' && (
         <div className="mb-2 flex items-center gap-3 rounded-[8px] bg-red-200/20 p-2">
